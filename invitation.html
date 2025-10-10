@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invites</title>
+    <link rel="stylesheet" href="invitation.css" />
+</head>
+
+<body>
+    <!-- HEADER -->
+    <header>
+        <h1>Upcoming Invites</h1>
+        
+        <!-- ACCOUNT BUTTON -->
+        <button class="account-btn">
+            <div class="account-icon"></div>
+            <span><a href="settings.html"> Account </a></span>
+        </button>
+    </header>
+
+    <table>
+        <tr>
+            <th>Event</th>
+            <th>Date</th>
+            <th>RSVP Status</th>
+            <th>Message Host</th>
+        </tr>
+        <tr>
+            <td>
+                <div class="event-cell">
+                    <div class="event-image"></div>
+                    <span>(Picture host puts in) Event Title</span>
+                </div>
+            </td>
+            <td>10/20/25</td>
+            <td>
+                <select>
+                    <option>Attending</option>
+                    <option>Not Attending</option>
+                    <option>Maybe</option>
+                </select>
+            </td>
+            <td>
+                <button class="message-btn">Host Name</button>
+            </td>
+        </tr>
+        <!-- Additional rows follow the same pattern -->
+    </table>
+</body>
+</html>
