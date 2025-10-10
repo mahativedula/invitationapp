@@ -1,0 +1,94 @@
+#login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+#login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 400px;
+    border: 2px solid black;
+    padding-top: 20px;
+    padding-bottom: 50px;
+    box-shadow: -5px 5px rgba(0, 0, 0, 0.5);
+}
+
+#login-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 250px;
+    padding-top: 20px;
+}
+
+#username {
+    margin-bottom: 10px;
+}
+
+#password-container {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    padding-top: 15px;
+    padding-bottom: 25px;
+    width: 300px;
+}
+
+#forgot {
+    color: navy;
+}
+
+#forgot:hover {
+    color: red;
+    cursor: pointer;
+}
+
+#remember-label {
+    align-self: center;
+    padding-right: 50px;
+}
+
+#register {
+    padding-bottom: 10px;
+    color: navy;
+}
+
+#register:hover {
+    color: red;
+    cursor: pointer;
+}
+
+#google {
+    width: 40px;
+}
+
+#google:hover {
+    cursor: pointer;
+}
+
+#submit:hover {
+    cursor: pointer;
+    background-color: darkgrey;
+}
+
+.form-input {
+    height: 30px;
+    border-radius: 20px;
+    border-width: 1px;
+}
+
+.form-text-input {
+    text-indent: 10px;
+}
+
+form > input {
+    width: 100%;
+    
+}
+
+a {
+    text-decoration: none;
+}

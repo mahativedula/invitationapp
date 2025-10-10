@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Event Creation</title>
+        <link rel="stylesheet" href="styles/event-creation.css">
+        <meta charset="UTF-8">
+    </head>
+    <body>
+        <h1>Event Creation Page</h1>
+        <div id="event-page">
+        <div id="left-page">
+            <div id="event-preview">
+                <img id="event-image" src="upload.jpg" alt="Event Image">
+                <div id="event-details">
+                    <h2 id="event-name">Event Name</h2>
+                    <p id="date">Date: mm/dd/yyyy</p>
+                    <p id="time">Time: --:--</p>
+                    <p id="location">Location: ______________</p>
+                    <p id="description">Description</p>
+                </div>
+            </div>
+            <div id="template">
+                <button class="arrow">&lt</button>
+                <p>Choose a Template</p>
+                <button class="arrow">&gt</button>
+            </div>
+        </div>
+        <div id="right-page">
+            <form id="event-form">
+                <label for="event-name-input">Event Name:</label>
+                <input type="text" id="event-name-input">
+                <label for="description-input">Description:</label>
+                <input type="text" id="description-input">
+                <div id="form-date-time">
+                    <label for="date-input">Date:</label>
+                    <input type="date" id="date-input">
+                    <label for="time-input">Time:</label>
+                    <input type="time" id="time-input">
+                </div>
+                <label for="location-input">Location:</label>
+                <input type="text" id="location-input">
+                <h3>List of Attendees:</h3>
+                <div id="attendee-list">
+                    <div id="name-container">
+                        <h4>Names:</h4>
+                        <p>Jane Doe</p>
+                        <p>Bob Smith</p>
+                        <p>Bob Smith</p>
+                        <p>Bob Smith</p>
+                        <p>Bob Smith</p>
+                        <p>Bob Smith</p>
+                        <p>Bob Smith</p>
+                        <p>Bob Smith</p>
+                    </div>
+                    <div id="email-container">
+                        <h4>Emails:</h4>
+                        <p>JaneDoe@gmail.com</p>
+                        <p>BobSmith@gmail.com</p>
+                        <p>BobSmith@gmail.com</p>
+                        <p>BobSmith@gmail.com</p>
+                        <p>BobSmith@gmail.com</p>
+                        <p>BobSmith@gmail.com</p>
+                        <p>BobSmith@gmail.com</p>
+                        <p>BobSmith@gmail.com</p>
+                    </div>
+                </div>
+                <div id="atteendee-container">
+                    <label for="attendee-name">Attendee Name: </label>
+                    <input type="text" id="attendee-name">
+                    <label for="attendee-name">Attendee Email: </label>
+                    <input type="text" id="attendee-email">
+                    <input type="submit" id="invite" value="Invite">
+                </div>
+                <input type="submit" id="submit" value="Host Event">
+            </form>
+        </div>
+        </div>
+    </body>
+</html>
