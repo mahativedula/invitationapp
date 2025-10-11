@@ -3,7 +3,7 @@
 
     <head>
         <title>Settings</title>
-        <!-- <link rel="stylesheet" href="styles/main.css"> -->
+        <link rel="stylesheet" href="styles/settings.css">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta charset="UTF-8">
         <meta author content="Mahati Vedula">
@@ -11,6 +11,45 @@
 
     <body>
         <!-- code -->
+        <h1>Settings</h1>
+        <div class="navbar">
+        </div>
+        
+        <div class="main-container">
+        <div class="sidebar">
+            <div>
+                <strong>Profile</strong><br>
+            </div>
+            <div>
+                <strong>Privacy</strong><br>
+            </div>
+            <div>
+                <strong>Notifications</strong><br>
+            </div>
+            <div>
+                <strong>Contacts</strong><br>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <h2>Account Settings</h2>
+            <form>
+                <label for="username">Update Username:</label><br>
+                <input type="text" id="username" name="username" value="current_username"><br>
+                <label for="email">Update Email:</label><br>
+                <input type="email" id="email" name="email" value="example@gmail.com"><br>
+                <br>
+                <h3>Change Password</h3>
+                <label for="password">Current Password:</label><br>
+                <input type="text" id="currentpassword" name="currentpassword"><br>
+                <label for="newpassword">New Password:</label><br>
+                <input type="text" id="newpassword" name="newpassword"><br>
+                <label for="confirmpassword">Confirm New Password:</label><br>
+                <input type="text" id="confirmpassword" name="confirmpassword"><br>
+                <input type="submit" value="Save Changes">
+            </form>
+        </div>   
+        </div>     
     </body>   
 
 </html>    
