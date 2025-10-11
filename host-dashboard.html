@@ -10,8 +10,8 @@
     </head> 
 
     <body>
-        <!-- code -->
        <br><br>
+       <!-- header menu -->
         <div class="navbar">
             <a href="event-creation.html">Create Event</a>
             <a href="host-dashboard.html">My Events</a>
@@ -24,61 +24,65 @@
         <br>
          <h1>Host Dashboard</h1>
         <div class="main-container">
-        <div class="sidebar col-4">
-            <h2>My Events</h2>
-            <div class="event-item" onclick="openEvent('Birthday', 'June 15, 2025', '4 PM')">
-            <strong>Birthday</strong><br>
-            <p>June 15, 2025 - 4 PM</p>
-            </div>
-
-            <div class="event-item" onclick="openEvent('Graduation', 'May 31, 2025', '4-7 PM')">
-            <strong>Graduation</strong><br>
-            <p>May 31, 2025 - 4-7 PM</p>
-            </div>
-
-            <div class="event-item" onclick="openEvent('Dinner Party', 'Aug 13, 2025', '6-8 PM')">
-            <strong>Dinner Party</strong><br>
-            <p>Aug 13, 2025 - 6-8 PM</p>
-            </div>
-        </div>
-        <div class="col-6" style = "margin-left: 50px;"> 
-            <div class="event-popup" id="eventPopup">
-            <div class="event-header">
-                <div class="event-image">
-                    🎈
+            <!-- sidebar of all the host's events; can click to view more detail and make edits -->
+            <div class="sidebar col-4">
+                <!-- example events -->
+                <h2>My Events</h2>
+                <div class="event-item" onclick="openEvent('Birthday', 'June 15, 2025', '4 PM')">
+                <strong>Birthday</strong><br>
+                <p>June 15, 2025 - 4 PM</p>
                 </div>
-                <div class="event-details">
-                    <h2 id="popupTitle">Event Title</h2>
-                    <p><strong>Date:</strong> <span id="popupDate"></span></p>
-                    <p><strong>Time:</strong> <span id="popupTime"></span></p>
-                    <button>Edit details</button>
+
+                <div class="event-item" onclick="openEvent('Graduation', 'May 31, 2025', '4-7 PM')">
+                <strong>Graduation</strong><br>
+                <p>May 31, 2025 - 4-7 PM</p>
+                </div>
+
+                <div class="event-item" onclick="openEvent('Dinner Party', 'Aug 13, 2025', '6-8 PM')">
+                <strong>Dinner Party</strong><br>
+                <p>Aug 13, 2025 - 6-8 PM</p>
                 </div>
             </div>
+            <!-- event view with more details and opportunity to edit + interact with the event -->
+            <div class="col-6" style = "margin-left: 50px;"> 
+                <div class="event-popup" id="eventPopup">
+                <div class="event-header">
+                    <div class="event-image">
+                        🎈
+                    </div>
+                    <div class="event-details">
+                        <h2 id="popupTitle">Event Title</h2>
+                        <p><strong>Date:</strong> <span id="popupDate"></span></p>
+                        <p><strong>Time:</strong> <span id="popupTime"></span></p>
+                        <button>Edit details</button>
+                    </div>
+                </div>
+                <!-- Guest list -->
+                <div class="guest-list">
+                    <h3>Guest List</h3>
+                    <table>
+                        <tr>
+                            <th>Guest</th>
+                            <th>RSVP</th>
+                        </tr>
+                        <tbody>
+                        <tr><td>Person 1</td><td>Yes</td></tr>
+                        <tr><td>Person 2</td><td>No</td></tr>
+                        <tr><td>Person 3</td><td>Maybe</td></tr>
+                        <tr><td>Person 4</td><td>No response</td></tr>
+                        </tbody>
+                    </table>
+                </div>
 
-            <div class="guest-list">
-                <h3>Guest List</h3>
-                <table>
-                    <tr>
-                        <th>Guest</th>
-                        <th>RSVP</th>
-                    </tr>
-                    <tbody>
-                    <tr><td>Person 1</td><td>Yes</td></tr>
-                    <tr><td>Person 2</td><td>No</td></tr>
-                    <tr><td>Person 3</td><td>Maybe</td></tr>
-                    <tr><td>Person 4</td><td>No response</td></tr>
-                    </tbody>
-                </table>
+                <div class="buttons">
+                    <button>Add guests</button>
+                    <button>Send announcement</button>
+                </div>
+                </div>
             </div>
-
-            <div class="buttons">
-                <button>Add guests</button>
-                <button>Send announcement</button>
-            </div>
-        </div>
-        </div>
         </div>
 
+        <!-- Used ChatGPT to figure out how to change the event view based on which event is clicked on -->
         <script>
             function openEvent(title, date, time) {
             document.getElementById('popupTitle').textContent = title;
