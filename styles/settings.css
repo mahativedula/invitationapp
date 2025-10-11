@@ -37,7 +37,7 @@ body {
 /* Main Layout */
 .main-container {
   display: flex;
-  margin-top: 60px; /* Push content below navbar */
+  margin-top: 30px; /* Push content below navbar */
 }
 
 /* Sidebar */

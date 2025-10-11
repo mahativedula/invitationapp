@@ -1,3 +1,30 @@
+/* Navbars */
+.navbar {
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 24px;
+  box-sizing: border-box;
+  z-index: 100;
+}
+
+.navbar a {
+  margin-left: 20px;
+  text-decoration: none;
+  color: #000;
+  font-weight: bold;
+}
+
+.navbar a:hover {
+  color: #0073e6;
+  text-decoration: underline;
+}
+
+/* Login Page Styles */
+
 #login {
     display: flex;
     align-items: center;
