@@ -31,7 +31,7 @@ CREATE TABLE rsvps (
     recipient_id INT REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     response VARCHAR(10) CHECK (response IN ('Going', 'Not Going', 'Maybe')) NOT NULL,
     responded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(event_id, user_id)
+    UNIQUE(event_id, recipient_id)
 );
 
 CREATE TABLE messages (

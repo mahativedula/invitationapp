@@ -23,8 +23,6 @@
   text-decoration: underline;
 }
 
-/* Login Page Styles */
-
 /* Reset and base styles */
 * {
     margin: 0;
@@ -96,7 +94,8 @@ table {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     border-color: #000;
     border-width: 1px;
-    border-style: solid;}
+    border-style: solid;
+}
 
 th {
     background-color: #f8f8f8;
