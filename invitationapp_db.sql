@@ -31,7 +31,7 @@ CREATE TABLE rsvps (
     recipient_id INT REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     response VARCHAR(10) CHECK (response IN ('Going', 'Not Going', 'Maybe')) NOT NULL,
     responded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(event_id, user_id)
+    UNIQUE(event_id, recipient_id)
 );
 
 CREATE TABLE messages (
@@ -40,7 +40,7 @@ CREATE TABLE messages (
     sender_id INT REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     recipient_id INT REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     subject VARCHAR(100) NOT NULL,
-    content TEXT(5000) NOT NULL,
+    content VARCHAR(5000) NOT NULL,
     viewed BOOLEAN DEFAULT FALSE,
     sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
