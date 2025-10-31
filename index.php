@@ -76,7 +76,7 @@
                 </form>
                 <!-- Account creation section -->
                 <p id="account-creation">Don't have an account?</p>
-                <a id="register" href="account-creation.html">Register</a>
+                <a id="register" href="account-creation.php">Register</a>
                 <img src="google-logo.webp" id="google" alt="Google Login">
             </div>
         </div>
