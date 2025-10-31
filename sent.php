@@ -24,9 +24,9 @@ $stmt = $db->prepare("
         u.last_name as recipient_last_name,
         u.user_id as recipient_id,
         e.event_name
-    FROM messages m
-    INNER JOIN users u ON m.recipient_id = u.user_id
-    LEFT JOIN events e ON m.event_id = e.event_id
+    FROM invitationapp_messages m
+    INNER JOIN invitationapp_users u ON m.recipient_id = u.user_id
+    LEFT JOIN invitationapp_events e ON m.event_id = e.event_id
     WHERE m.sender_id = :user_id
     AND (m.subject LIKE :search OR u.first_name LIKE :search OR u.last_name LIKE :search)
     ORDER BY m.sent_at DESC

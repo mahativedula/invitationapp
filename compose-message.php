@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         try {
             $stmt = $db->prepare("
-                INSERT INTO messages (event_id, sender_id, recipient_id, subject, content)
+                INSERT INTO invitationapp_messages (event_id, sender_id, recipient_id, subject, content)
                 VALUES (:event_id, :sender_id, :recipient_id, :subject, :content)
             ");
             

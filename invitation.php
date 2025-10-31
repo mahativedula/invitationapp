@@ -22,9 +22,9 @@ $stmt = $db->prepare("
         u.first_name as host_first_name,
         u.last_name as host_last_name,
         u.user_id as host_id
-    FROM events e
-    INNER JOIN rsvps r ON e.event_id = r.event_id
-    INNER JOIN users u ON e.host_id = u.user_id
+    FROM invitationapp_events e
+    INNER JOIN invitationapp_rsvps r ON e.event_id = r.event_id
+    INNER JOIN invitationapp_users u ON e.host_id = u.user_id
     WHERE r.recipient_id = :user_id
     AND e.date >= CURRENT_DATE
     ORDER BY e.date ASC, e.start_time ASC
