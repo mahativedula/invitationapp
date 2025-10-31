@@ -32,6 +32,9 @@
         case 'host-dashboard':
             require 'host-dashboard.php';
             break;
+        case 'create-event':
+            require 'create-event.php';
+            break;    
         default:
             header("Location: login.php");
             break;

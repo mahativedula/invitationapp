@@ -1,7 +1,9 @@
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS events;
-DROP TABLE IF EXISTS rsvps;
-DROP TABLE IF EXISTS messages;
+CREATE DATABASE IF NOT EXISTS invitationapp_db;
+
+DROP TABLE IF EXISTS messages CASCADE;
+DROP TABLE IF EXISTS rsvps CASCADE;
+DROP TABLE IF EXISTS events CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
 
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
@@ -29,7 +31,7 @@ CREATE TABLE rsvps (
     rsvp_id SERIAL PRIMARY KEY,
     event_id INT REFERENCES events(event_id) ON DELETE CASCADE ON UPDATE CASCADE,
     recipient_id INT REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    response VARCHAR(10) CHECK (response IN ('Going', 'Not Going', 'Maybe')) NOT NULL,
+    response VARCHAR(20) CHECK (response IN ('No Response', 'Going', 'Not Going', 'Maybe')) NOT NULL,
     responded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(event_id, recipient_id)
 );

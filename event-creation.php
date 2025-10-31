@@ -5,6 +5,56 @@
         <link rel="stylesheet" href="styles/event-creation.css">
         <meta charset="UTF-8">
         <meta author content="Kayleen Do">
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const guestList = [];
+                const attendeeListDiv = document.getElementById("attendee-list");
+                const nameInput = document.getElementById("attendee-name");
+                const emailInput = document.getElementById("attendee-email");
+                const inviteBtn = document.getElementById("invite");
+                const hiddenGuestInput = document.getElementById("guest-data");
+
+                // Add guest to temporary list
+                inviteBtn.addEventListener("click", function(e) {
+                    e.preventDefault();
+
+                    const name = nameInput.value.trim();
+                    const email = emailInput.value.trim();
+
+                    if (name === "" || email === "") {
+                        alert("Please enter both name and email.");
+                        return;
+                    }
+
+                    // Add to guest list array
+                    guestList.push({ name, email });
+
+                    // Update display
+                    updateGuestList();
+
+                    // Update hidden input for PHP
+                    hiddenGuestInput.value = JSON.stringify(guestList);
+
+                    // Clear inputs
+                    nameInput.value = "";
+                    emailInput.value = "";
+                });
+
+                // Update displayed guest list
+                function updateGuestList() {
+                    attendeeListDiv.innerHTML = `
+                        <div id="name-container">
+                            <h4>Names:</h4>
+                            ${guestList.map(g => `<p>${g.name}</p>`).join("")}
+                        </div>
+                        <div id="email-container">
+                            <h4>Emails:</h4>
+                            ${guestList.map(g => `<p>${g.email}</p>`).join("")}
+                        </div>
+                    `;
+                }
+            });
+        </script>
     </head>
     <body>
         <br>
@@ -40,53 +90,39 @@
         </div>
         <!-- Form Input for Event Creation -->
         <div id="right-page">
-            <form id="event-form">
+            <form method="POST" action="index.php?page=create-event">
                 <label for="event-name-input">Event Name:</label>
-                <input type="text" id="event-name-input">
+                <input type="text" id="event-name-input" name="event_name" required>
                 <label for="description-input">Description:</label>
-                <input type="text" id="description-input">
+                <input type="text" id="description-input" name="description">
                 <div id="form-date-time">
                     <label for="date-input">Date:</label>
-                    <input type="date" id="date-input">
+                    <input type="date" id="date-input" name="date" required>
                     <label for="time-input">Time:</label>
-                    <input type="time" id="time-input">
+                    <input type="time" id="time-input" name="time" required>
                 </div>
                 <label for="location-input">Location:</label>
-                <input type="text" id="location-input">
-                <h3>List of Attendees:</h3>
-                <div id="attendee-list">
-                    <div id="name-container">
-                        <h4>Names:</h4>
-                        <p>Jane Doe</p>
-                        <p>Bob Smith</p>
-                        <p>Bob Smith</p>
-                        <p>Bob Smith</p>
-                        <p>Bob Smith</p>
-                        <p>Bob Smith</p>
-                        <p>Bob Smith</p>
-                        <p>Bob Smith</p>
+                <input type="text" id="location-input" name="location" required>
+            
+                <h3>Guest List</h3>
+                    <div id="attendee-list">
+                        <div id="name-container"><h4>Names:</h4></div>
+                        <div id="email-container"><h4>Emails:</h4></div>
                     </div>
-                    <div id="email-container">
-                        <h4>Emails:</h4>
-                        <p>JaneDoe@gmail.com</p>
-                        <p>BobSmith@gmail.com</p>
-                        <p>BobSmith@gmail.com</p>
-                        <p>BobSmith@gmail.com</p>
-                        <p>BobSmith@gmail.com</p>
-                        <p>BobSmith@gmail.com</p>
-                        <p>BobSmith@gmail.com</p>
-                        <p>BobSmith@gmail.com</p>
+                    <div id="attendee-container">
+                        <label for="attendee-name">Attendee Name: </label>
+                        <input type="text" id="attendee-name" placeholder="e.g. Jane Doe">
+                        <label for="attendee-email">Attendee Email: </label>
+                        <input type="email" id="attendee-email" placeholder="e.g. jane@example.com">
+                        <button id="invite">Add Guest</button>
                     </div>
-                </div>
-                <!-- Form Input for Attendee List -->
-                <div id="atteendee-container">
-                    <label for="attendee-name">Attendee Name: </label>
-                    <input type="text" id="attendee-name">
-                    <label for="attendee-email">Attendee Email: </label>
-                    <input type="text" id="attendee-email">
-                    <input type="submit" id="invite" value="Invite">
-                </div>
-                <input type="submit" id="submit" value="Host Event">
+
+                    <!-- Hidden input to hold guest data -->
+                    <input type="hidden" id="guest-data" name="guest_data">
+                    <br>
+                    <div id="create-event-button">
+                    <input type="submit" id="create-event" value="Create Event">
+                    </div>
             </form>
         </div>
         </div>
