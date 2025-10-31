@@ -13,7 +13,7 @@
         <!-- NAVIGATION MENU -->
     <header>
         <nav>
-            <li><h1><a href = "message.html">Inbox</a></h1></li>
+            <li><h1><a href = "message.php">Inbox</a></h1></li>
             <li><h1>Sent</h1></li>
         </nav>
 
@@ -24,7 +24,7 @@
 
         <button class="account-btn">
             <div class="account-icon"></div>
-            <span><a href = "settings.html">Account</a></span>
+            <span><a href = "settings.php">Account</a></span>
         </button>
     </header>
 

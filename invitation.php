@@ -12,11 +12,11 @@
     <!-- HEADER -->
     <br>
     <div class="navbar">
-            <a href="event-creation.html">Create Event</a>
-            <a href="host-dashboard.html">My Events</a>
-            <a href="invitation.html">My Invites</a>
-            <a href="message.html">Messages</a>
-            <a href="settings.html">Settings</a>
+            <a href="event-creation.php">Create Event</a>
+            <a href="host-dashboard.php">My Events</a>
+            <a href="invitation.php">My Invites</a>
+            <a href="message.php">Messages</a>
+            <a href="settings.php">Settings</a>
             <a href="index.php">Logout</a>
     </div>
     <br>
