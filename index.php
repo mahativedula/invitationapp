@@ -38,6 +38,15 @@
         case 'delete-event':
             require 'delete-event.php';
             break;
+        case 'invitation':
+            require 'invitation.php';
+            break;
+        case 'messages':    
+            require 'message.php';
+            break;
+        case 'sent':
+            require 'sent.php';
+            break;
         default:
             header("Location: login.php");
             break;
