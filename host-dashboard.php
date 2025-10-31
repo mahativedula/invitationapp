@@ -1,8 +1,9 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once 'db-connect.php';
 
-// make sure user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
@@ -10,7 +11,27 @@ if (!isset($_SESSION['user_id'])) {
 
 $host_id = $_SESSION['user_id'];
 
-// get only events created by the logged-in host
+// --- Handle deletion if form submitted ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['event_id'])) {
+    $event_id = (int) $_POST['event_id'];
+
+    try {
+        $stmt = $db->prepare("DELETE FROM events WHERE event_id = :event_id AND host_id = :host_id");
+        $stmt->execute([':event_id' => $event_id, ':host_id' => $host_id]);
+
+        if ($stmt->rowCount() > 0) {
+            header("Location: host-dashboard.php?status=deleted");
+        } else {
+            header("Location: host-dashboard.php?status=notfound");
+        }
+        exit;
+    } catch (PDOException $e) {
+        header("Location: host-dashboard.php?status=error");
+        exit;
+    }
+}
+
+// --- Load events for this host ---
 try {
     $stmt = $db->prepare("SELECT event_id, event_name, date, start_time, end_time FROM events WHERE host_id = :host_id ORDER BY date ASC");
     $stmt->execute([':host_id' => $host_id]);
@@ -51,10 +72,16 @@ try {
 
             <?php if (empty($events)): ?>
                 <p>You haven't created any events yet.</p>
+                <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    document.getElementById('eventPopup').style.display = 'none';
+                });
+                </script>
             <?php else: ?>
-                <?php foreach ($events as $event): ?>
+                <?php foreach ($events as $index => $event): ?>
                     <div 
                         class="event-item" 
+                        id="<?php echo $index === 0 ? 'first-event' : ''; ?>"
                         onclick="openEvent(
                             '<?php echo htmlspecialchars(addslashes($event['event_name'])); ?>', 
                             '<?php echo htmlspecialchars(date('F j, Y', strtotime($event['date']))); ?>', 
@@ -103,7 +130,14 @@ try {
                 <div class="buttons">
                     <button>Add guests</button>
                     <button>Send announcement</button>
+                    <form method="POST" style="display:inline;">
+                        <input type="hidden" id="deleteEventId" name="event_id">
+                        <button type="submit" id="deleteButton" onclick="return confirm('Are you sure you want to delete this event?')">
+                            Delete Event
+                        </button>
+                    </form>
                 </div>
+
             </div>
         </div>
     </div>
@@ -116,7 +150,10 @@ try {
             document.getElementById('popupTime').textContent = time;
             document.getElementById('eventPopup').classList.add('active');
 
-            // load guests dynamically
+            // Set the event ID for delete form
+            document.getElementById('deleteEventId').value = eventId;
+
+            // Load guests dynamically (same as before)
             fetch(`get-guests.php?event_id=${eventId}`)
                 .then(res => res.json())
                 .then(data => {
@@ -137,10 +174,21 @@ try {
                 })
                 .catch(err => {
                     console.error(err);
-                    document.getElementById('guestTableBody').innerHTML = 
+                    document.getElementById('guestTableBody').innerHTML =
                         '<tr><td colspan="2" style="color:red;">Error loading guests</td></tr>';
                 });
         }
+
     </script>
+    <script>
+    // After the page loads, automatically open the first event (if it exists)
+    document.addEventListener('DOMContentLoaded', function() {
+        const firstEventDiv = document.getElementById('first-event');
+        if (firstEventDiv) {
+            firstEventDiv.click(); // triggers openEvent() for the first event
+        }
+    });
+    </script>
+
 </body>
 </html>

@@ -35,6 +35,9 @@
         case 'create-event':
             require 'create-event.php';
             break;    
+        case 'delete-event':
+            require 'delete-event.php';
+            break;
         default:
             header("Location: login.php");
             break;
