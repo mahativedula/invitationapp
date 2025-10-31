@@ -24,13 +24,16 @@
     // Redirect based on the page parameter
     switch ($page) {
         case 'login':
-            header("Location: login.php");
-            exit();
+            require 'login.php';
+            break;
         case 'account-creation':
-            header("Location: account-creation.php");
-            exit();
+            require 'account-creation.php';
+            break;
+        case 'host-dashboard':
+            require 'host-dashboard.php';
+            break;
         default:
             header("Location: login.php");
-            exit();
+            break;
     }
 ?>

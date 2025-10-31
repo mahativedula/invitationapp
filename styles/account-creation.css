@@ -56,3 +56,15 @@ input {
     padding-right: 20px;
     text-align: center;
 }
+
+/* Login Link */
+
+#login-link {
+    color: navy;
+    padding-top: 20px;
+}
+
+#login-link:hover {
+    color: red;
+    cursor: pointer;
+}

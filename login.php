@@ -1,20 +1,5 @@
 <?php
-    // login functionality
-    session_start();
-
     $error_message = '';
-
-    try {
-        $db = new PDO(
-        "pgsql:host=db;port=5432;dbname=invitationapp_db",
-        "localuser",
-        "cs4640LocalUser!",
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-      );  
-    } catch (PDOException $e) {
-        $error_message = "Error connecting to database: " . $e->getMessage();
-        exit();
-    }
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $username = $_POST['username'];
@@ -31,7 +16,7 @@
             if ($user && password_verify($password, $user['password_hash'])) {
                 $_SESSION['user_id'] = $user['user_id'];
                 $_SESSION['username'] = $user['username'];
-                header("Location: host-dashboard.php");
+                header("Location: index.php?page=host-dashboard");
                 exit();
             } else {
                 $error_message = "Invalid username or password.";
@@ -64,7 +49,7 @@
                 ?>
 
                 <!-- Login Form -->
-                <form id="login-form" method="POST" action="">
+                <form id="login-form" method="POST" action="index.php?page=login">
                     <input type="text" class="form-input form-text-input" id="username" placeholder="Username" name="username" required>
                     <input type="password" class="form-input form-text-input" id="password" placeholder="Password" name="password" required>
                     <div id="password-container">
@@ -76,7 +61,7 @@
                 </form>
                 <!-- Account creation section -->
                 <p id="account-creation">Don't have an account?</p>
-                <a id="register" href="account-creation.php">Register</a>
+                <a id="register" href="index.php?page=account-creation">Register</a>
                 <img src="google-logo.webp" id="google" alt="Google Login">
             </div>
         </div>

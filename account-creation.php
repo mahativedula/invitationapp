@@ -1,20 +1,6 @@
 <?php
-    // login functionality
-    session_start();
-
     $error_message = '';
-
-    try {
-        $db = new PDO(
-        "pgsql:host=db;port=5432;dbname=invitationapp_db",
-        "localuser",
-        "cs4640LocalUser!",
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-      );  
-    } catch (PDOException $e) {
-        $error_message = "Error connecting to database: " . $e->getMessage();
-        exit();
-    }
+    $stmt = $db->prepare("SELECT * FROM users WHERE username = :username");
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $fname = $_POST['fname'];
@@ -46,7 +32,7 @@
 
             try {
                 $stmt->execute();
-                header("Location: host-dashboard.php");
+                header("Location: index.php?page=host-dashboard");
                 exit();
             } catch (PDOException $e) {
                 if ($e->getCode() == 23505) { // Unique violation
@@ -80,7 +66,7 @@
                 ?>
 
                 <!-- Account Creation Form -->
-                <form id="create-form" action="" method="POST">
+                <form id="create-form" action="index.php?page=account-creation" method="POST">
                     <div id="name">
                         <input type="text" class="form-text-input" placeholder="First Name" id="fname" name="fname">
                         <input type="text" class="form-text-input" placeholder="Last Name" id="lname" name="lname">
@@ -91,6 +77,7 @@
                     <input type="password" class="form-text-input" placeholder="Confirm Password" id="confirm-pword" name="confirm-pword">
                     <input type="submit" value="Create Account" id="submit">
                 </form>
+                <a id="login-link" href="index.php?page=login">Already have an account? Login</a>
             </div>
         </div>
     </body>
