@@ -33,7 +33,7 @@
             require 'host-dashboard.php';
             break;
         case 'create-event':
-            require 'create-event.php';
+            require 'event-creation.php';
             break;    
         case 'delete-event':
             require 'delete-event.php';
