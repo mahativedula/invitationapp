@@ -28,6 +28,10 @@
             $error_message = "Please fill in all fields.";
         } elseif ($password !== $confirm_pword) {
             $error_message = "Passwords do not match.";
+        } elseif (!preg_match("/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/", $password)) {
+            $error_message = "Weak password: Please include a mix of lower and upper case letters, numbers, and be at least 8 characters long.";
+        } elseif (!preg_match("/^[\w\.-]+@[\w\.-]+\.\w{2,}$/", $email)) {
+            $error_message = "Invalid email format.";
         } else {
             // Hash the password
             $password_hash = password_hash($password, PASSWORD_BCRYPT);
@@ -42,7 +46,7 @@
 
             try {
                 $stmt->execute();
-                header("Location: host-dashboard.html");
+                header("Location: host-dashboard.php");
                 exit();
             } catch (PDOException $e) {
                 if ($e->getCode() == 23505) { // Unique violation
@@ -68,13 +72,20 @@
             <div id="create-container">
                 <!-- Header -->
                 <h1>Create an Account</h1>
+
+                <?php
+                    if (!empty($error_message)) {
+                        echo '<p class="error-message">' . htmlspecialchars($error_message) . '</p>';
+                    }
+                ?>
+
                 <!-- Account Creation Form -->
                 <form id="create-form" action="" method="POST">
                     <div id="name">
                         <input type="text" class="form-text-input" placeholder="First Name" id="fname" name="fname">
                         <input type="text" class="form-text-input" placeholder="Last Name" id="lname" name="lname">
                     </div>
-                    <input type="text" class="form-text-input" placeholder="Email" id="email" name="email">
+                    <input type="email" class="form-text-input" placeholder="Email" id="email" name="email">
                     <input type="text" class="form-text-input" placeholder="Username" id="username" name="username">
                     <input type="password" class="form-text-input" placeholder="Password" id="password" name="password">
                     <input type="password" class="form-text-input" placeholder="Confirm Password" id="confirm-pword" name="confirm-pword">
