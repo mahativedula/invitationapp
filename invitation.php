@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         <a href="invitation.php">My Invites</a>
         <a href="message.php">Messages</a>
         <a href="settings.php">Settings</a>
-        <a href="logout.php">Logout</a>
+        <a href="login.php">Logout</a>
     </div>
     <br>
     <br>

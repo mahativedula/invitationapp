@@ -8,9 +8,9 @@
 
     try {
         $db = new PDO(
-        "pgsql:host=localhost;port=5432;dbname=nsc3sj",
-        "nsc3sj",
-        "DnN602qOYMx6",
+        "pgsql:host=localhost;port=5432;dbname=COMPUTING_ID_HERE",
+        "COMPUTING_ID_HERE",
+        "phpgsql_password_here",
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
         );
     } catch (PDOException $e) {
