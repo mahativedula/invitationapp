@@ -114,6 +114,7 @@ $messages = $stmt->fetchAll();
         <nav>
             <li><h1><a href="index.php?page=messages">Inbox</a></h1></li>
             <li><h1>Sent</h1></li>
+            <li><h1><a href="index.php?page=compose-message">Compose</a></h1></li>
         </nav>
 
         <!-- SEARCH BAR -->

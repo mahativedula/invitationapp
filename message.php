@@ -3,7 +3,7 @@
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: index.php?page=messages");
+    header("Location: index.php?page=login");
     exit();
 }
 
@@ -57,7 +57,7 @@ $stmt = $db->prepare("
         u.last_name as sender_last_name,
         u.user_id as sender_id,
         e.event_name
-    FROM invitationapp_messages m
+    FROM messages m
     INNER JOIN invitationapp_users u ON m.sender_id = u.user_id
     LEFT JOIN invitationapp_events e ON m.event_id = e.event_id
     WHERE m.recipient_id = :user_id
@@ -138,7 +138,7 @@ $messages = $stmt->fetchAll();
         <a href="index.php?page=host-dashboard">My Events</a>
         <a href="index.php?page=invitation">My Invites</a>
         <a href="index.php?page=messages">Messages</a>
-        <a href="settings.php">Settings</a>
+        <a href="settings.html">Settings</a>
         <a href="index.php?page=login">Logout</a>
     </div>
     <br>
@@ -152,6 +152,7 @@ $messages = $stmt->fetchAll();
         <nav>
             <li><h1>Inbox</h1></li>
             <li><h1><a href="index.php?page=sent">Sent Items</a></h1></li>
+            <li><h1><a href="index.php?page=compose-message">Compose</a></h1></li>
         </nav>
         
         <!-- SEARCH BAR -->

@@ -16,7 +16,7 @@ $event_id = $_GET['event_id'] ?? null;
 // Fetch recipient info if provided
 $recipient = null;
 if ($recipient_id) {
-    $stmt = $db->prepare("SELECT user_id, first_name, last_name FROM users WHERE user_id = :user_id");
+    $stmt = $db->prepare("SELECT user_id, first_name, last_name FROM invitationapp_users WHERE user_id = :user_id");
     $stmt->execute(['user_id' => $recipient_id]);
     $recipient = $stmt->fetch();
 }
@@ -24,13 +24,13 @@ if ($recipient_id) {
 // Fetch event info if provided
 $event = null;
 if ($event_id) {
-    $stmt = $db->prepare("SELECT event_id, event_name FROM events WHERE event_id = :event_id");
+    $stmt = $db->prepare("SELECT event_id, event_name FROM invitationapp_events WHERE event_id = :event_id");
     $stmt->execute(['event_id' => $event_id]);
     $event = $stmt->fetch();
 }
 
 // Fetch all users for recipient selection
-$stmt = $db->prepare("SELECT user_id, first_name, last_name FROM users WHERE user_id != :user_id ORDER BY first_name, last_name");
+$stmt = $db->prepare("SELECT user_id, first_name, last_name FROM invitationapp_users WHERE user_id != :user_id ORDER BY first_name, last_name");
 $stmt->execute(['user_id' => $user_id]);
 $all_users = $stmt->fetchAll();
 
@@ -94,6 +94,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
     <br>
     <br>
+    <br>
+
+    <!-- HEADER -->
+    <header>
+        <h1>Messages</h1>
+        <nav>
+            <li><h1><a href="index.php?page=messages">Inbox</a></h1></li>
+            <li><h1><a href="index.php?page=sent">Sent Items</a></h1></li>
+            <li><h1>Compose</h1></li>
+        </nav>
+        
+        <!-- SEARCH BAR (empty for compose page) -->
+        <div class="search-bar">
+        </div>
+    </header>
 
     <div class="compose-form">
         <h2>Compose Message</h2>
@@ -151,3 +166,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </body>
 </html>
+
+
+
