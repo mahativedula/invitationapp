@@ -4,7 +4,7 @@
         <title>Event Creation</title>
         <link rel="stylesheet" href="styles/event-creation.css">
         <meta charset="UTF-8">
-        <meta author content="Kayleen Do">
+        <meta author content="Kayleen Do + Mahati Vedula">
         <script>
             document.addEventListener("DOMContentLoaded", function() {
                 const guestList = [];
@@ -54,6 +54,8 @@
                     `;
                 }
             });
+            // Note to self: add check to make sure guest email is registered in DB before adding to guest list; or, 
+            // inplement functionality to send invite to unregistered emails prompting them to create accountity
         </script>
     </head>
     <body>
