@@ -56,7 +56,7 @@ function validate_event_data($event_name, $date, $time, $location, $guests) {
  */
 function create_event($db, $host_id, $event_name, $date, $time, $location, $description) {
     $stmt = $db->prepare("
-        INSERT INTO events (host_id, event_name, date, start_time, location, description)
+        INSERT INTO invitationapp_events (host_id, event_name, date, start_time, location, description)
         VALUES (:host_id, :event_name, :date, :start_time, :location, :description)
         RETURNING event_id;
     ");
@@ -76,11 +76,11 @@ function create_event($db, $host_id, $event_name, $date, $time, $location, $desc
  */
 function invite_registered_guests($db, $event_id, $guests) {
     $rsvp_stmt = $db->prepare("
-        INSERT INTO rsvps (event_id, recipient_id, response)
+        INSERT INTO invitationapp_rsvps (event_id, recipient_id, response)
         VALUES (:event_id, :recipient_id, 'No Response')
         ON CONFLICT DO NOTHING
     ");
-    $user_lookup = $db->prepare("SELECT user_id FROM users WHERE email = :email");
+    $user_lookup = $db->prepare("SELECT user_id FROM invitationapp_users WHERE email = :email");
 
     foreach ($guests as $guest) {
         $email = trim($guest['email'] ?? '');

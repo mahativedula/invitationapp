@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['event_id'])) {
     $event_id = (int) $_POST['event_id'];
 
     try {
-        $stmt = $db->prepare("DELETE FROM events WHERE event_id = :event_id AND host_id = :host_id");
+        $stmt = $db->prepare("DELETE FROM invitationapp_events WHERE event_id = :event_id AND host_id = :host_id");
         $stmt->execute([':event_id' => $event_id, ':host_id' => $host_id]);
 
         if ($stmt->rowCount() > 0) {
@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['event_id'])) {
 
 // --- Load events for this host ---
 try {
-    $stmt = $db->prepare("SELECT event_id, event_name, date, start_time, end_time FROM events WHERE host_id = :host_id ORDER BY date ASC");
+    $stmt = $db->prepare("SELECT event_id, event_name, date, start_time, end_time FROM invitationapp_events WHERE host_id = :host_id ORDER BY date ASC");
     $stmt->execute([':host_id' => $host_id]);
     $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {

@@ -14,8 +14,8 @@ try {
         SELECT 
             CONCAT(u.first_name, ' ', u.last_name) AS name,
             r.response
-        FROM rsvps r
-        JOIN users u ON r.recipient_id = u.user_id
+        FROM invitationapp_rsvps r
+        JOIN invitationapp_users u ON r.recipient_id = u.user_id
         WHERE r.event_id = :event_id
         ORDER BY name ASC
     ");

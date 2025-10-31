@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS rsvps CASCADE;
 DROP TABLE IF EXISTS events CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 
-CREATE TABLE users (
+CREATE TABLE invitationapp_users (
     user_id SERIAL PRIMARY KEY,
     first_name VARCHAR(20) NOT NULL,
     last_name VARCHAR(20) NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE events (
+CREATE TABLE invitationapp_events (
     event_id SERIAL PRIMARY KEY,
     host_id INT REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     event_name VARCHAR(100) NOT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE events (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE rsvps (
+CREATE TABLE invitationapp_rsvps (
     rsvp_id SERIAL PRIMARY KEY,
     event_id INT REFERENCES events(event_id) ON DELETE CASCADE ON UPDATE CASCADE,
     recipient_id INT REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -36,7 +36,7 @@ CREATE TABLE rsvps (
     UNIQUE(event_id, recipient_id)
 );
 
-CREATE TABLE messages (
+CREATE TABLE invitationapp_messages (
     message_id SERIAL PRIMARY KEY,
     event_id INT REFERENCES events(event_id) ON DELETE CASCADE ON UPDATE CASCADE,
     sender_id INT REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
