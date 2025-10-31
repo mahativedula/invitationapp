@@ -8,7 +8,7 @@
         if (empty($username) || empty($password)) {
             $error_message = "Please enter both username and password.";
         } else {
-            $stmt = $db->prepare("SELECT * FROM users WHERE username = :username");
+            $stmt = $db->prepare("SELECT * FROM invitationapp_users WHERE username = :username");
             $stmt->bindParam(':username', $username);
             $stmt->execute();
             $user = $stmt->fetch(PDO::FETCH_ASSOC);

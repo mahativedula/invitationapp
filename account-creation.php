@@ -1,6 +1,6 @@
 <?php
     $error_message = '';
-    $stmt = $db->prepare("SELECT * FROM users WHERE username = :username");
+    $stmt = $db->prepare("SELECT * FROM invitationapp_users WHERE username = :username");
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $fname = $_POST['fname'];
@@ -23,7 +23,7 @@
             $password_hash = password_hash($password, PASSWORD_BCRYPT);
 
             // Insert new user into the database
-            $stmt = $db->prepare("INSERT INTO users (first_name, last_name, email, username, password_hash) VALUES (:fname, :lname, :email, :username, :password_hash)");
+            $stmt = $db->prepare("INSERT INTO invitationapp_users (first_name, last_name, email, username, password_hash) VALUES (:fname, :lname, :email, :username, :password_hash)");
             $stmt->bindParam(':fname', $fname);
             $stmt->bindParam(':lname', $lname);
             $stmt->bindParam(':email', $email);
