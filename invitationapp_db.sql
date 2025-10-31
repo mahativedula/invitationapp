@@ -1,9 +1,7 @@
-CREATE DATABASE IF NOT EXISTS invitationapp_db;
-
-DROP TABLE IF EXISTS messages CASCADE;
-DROP TABLE IF EXISTS rsvps CASCADE;
-DROP TABLE IF EXISTS events CASCADE;
-DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS invitationapp_messages CASCADE;
+DROP TABLE IF EXISTS invitationapp_rsvps CASCADE;
+DROP TABLE IF EXISTS invitationapp_events CASCADE;
+DROP TABLE IF EXISTS invitationapp_users CASCADE;
 
 CREATE TABLE invitationapp_users (
     user_id SERIAL PRIMARY KEY,
@@ -17,7 +15,7 @@ CREATE TABLE invitationapp_users (
 
 CREATE TABLE invitationapp_events (
     event_id SERIAL PRIMARY KEY,
-    host_id INT REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    host_id INT REFERENCES invitationapp_users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     event_name VARCHAR(100) NOT NULL,
     date DATE NOT NULL,
     start_time TIME NOT NULL,
@@ -29,8 +27,8 @@ CREATE TABLE invitationapp_events (
 
 CREATE TABLE invitationapp_rsvps (
     rsvp_id SERIAL PRIMARY KEY,
-    event_id INT REFERENCES events(event_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    recipient_id INT REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    event_id INT REFERENCES invitationapp_events(event_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    recipient_id INT REFERENCES invitationapp_users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     response VARCHAR(20) CHECK (response IN ('No Response', 'Going', 'Not Going', 'Maybe')) NOT NULL,
     responded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(event_id, recipient_id)
@@ -38,9 +36,9 @@ CREATE TABLE invitationapp_rsvps (
 
 CREATE TABLE invitationapp_messages (
     message_id SERIAL PRIMARY KEY,
-    event_id INT REFERENCES events(event_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    sender_id INT REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    recipient_id INT REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    event_id INT REFERENCES invitationapp_events(event_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    sender_id INT REFERENCES invitationapp_users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    recipient_id INT REFERENCES invitationapp_users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     subject VARCHAR(100) NOT NULL,
     content VARCHAR(5000) NOT NULL,
     viewed BOOLEAN DEFAULT FALSE,
