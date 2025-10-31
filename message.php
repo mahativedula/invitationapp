@@ -57,7 +57,7 @@ $stmt = $db->prepare("
         u.last_name as sender_last_name,
         u.user_id as sender_id,
         e.event_name
-    FROM messages m
+    FROM invitationapp_messages m
     INNER JOIN invitationapp_users u ON m.sender_id = u.user_id
     LEFT JOIN invitationapp_events e ON m.event_id = e.event_id
     WHERE m.recipient_id = :user_id
