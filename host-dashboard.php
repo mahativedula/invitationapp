@@ -1,55 +1,81 @@
+<?php
+session_start();
+require_once 'db-connect.php';
+
+// make sure user is logged in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
+
+$host_id = $_SESSION['user_id'];
+
+// get only events created by the logged-in host
+try {
+    $stmt = $db->prepare("SELECT event_id, event_name, date, start_time, end_time FROM events WHERE host_id = :host_id ORDER BY date ASC");
+    $stmt->execute([':host_id' => $host_id]);
+    $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    echo "<p style='color:red;'>Error loading your events: " . htmlspecialchars($e->getMessage()) . "</p>";
+    $events = [];
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
-    <head>
-        <title>Host Dashboard</title>
-        <link rel="stylesheet" href="styles/host-dashboard.css">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta charset="UTF-8">
-        <meta author content="Mahati Vedula">
-    </head> 
+<head>
+    <title>Host Dashboard</title>
+    <link rel="stylesheet" href="styles/host-dashboard.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta author content="Mahati Vedula">
+</head>
 
-    <body>
-       <br><br>
-       <!-- header menu -->
-        <div class="navbar">
-            <a href="event-creation.php">Create Event</a>
-            <a href="host-dashboard.php">My Events</a>
-            <a href="invitation.php">My Invites</a>
-            <a href="message.php">Messages</a>
-            <a href="settings.php">Settings</a>
-            <a href="login.php">Logout</a>
-        </div>
-        <br>
-        <br>
-         <h1>Host Dashboard</h1>
-        <div class="main-container">
-            <!-- sidebar of all the host's events; can click to view more detail and make edits -->
-            <div class="sidebar col-4">
-                <!-- example events -->
-                <h2>My Events</h2>
-                <div class="event-item" onclick="openEvent('Birthday', 'June 15, 2025', '4 PM')">
-                <strong>Birthday</strong>
-                <p>June 15, 2025 - 4 PM</p>
-                </div>
+<body>
+    <br><br>
+    <!-- header menu -->
+    <div class="navbar">
+        <a href="event-creation.php">Create Event</a>
+        <a href="host-dashboard.php">My Events</a>
+        <a href="invitation.php">My Invites</a>
+        <a href="message.php">Messages</a>
+        <a href="settings.php">Settings</a>
+        <a href="login.php">Logout</a>
+    </div>
+    <br><br>
+    <h1>Host Dashboard</h1>
+    <div class="main-container">
+        <!-- sidebar of all the host's events -->
+        <div class="sidebar col-4">
+            <h2>My Events</h2>
 
-                <div class="event-item" onclick="openEvent('Graduation', 'May 31, 2025', '4-7 PM')">
-                <strong>Graduation</strong>
-                <p>May 31, 2025 - 4-7 PM</p>
-                </div>
-
-                <div class="event-item" onclick="openEvent('Dinner Party', 'Aug 13, 2025', '6-8 PM')">
-                <strong>Dinner Party</strong>
-                <p>Aug 13, 2025 - 6-8 PM</p>
-                </div>
-            </div>
-            <!-- event view with more details and opportunity to edit + interact with the event -->
-            <div class="col-6" style = "margin-left: 50px;"> 
-                <div class="event-popup" id="eventPopup">
-                <div class="event-header">
-                    <div class="event-image">
-                        🎈
+            <?php if (empty($events)): ?>
+                <p>You haven't created any events yet.</p>
+            <?php else: ?>
+                <?php foreach ($events as $event): ?>
+                    <div 
+                        class="event-item" 
+                        onclick="openEvent(
+                            '<?php echo htmlspecialchars(addslashes($event['event_name'])); ?>', 
+                            '<?php echo htmlspecialchars(date('F j, Y', strtotime($event['date']))); ?>', 
+                            '<?php echo htmlspecialchars(substr($event['start_time'], 0, 5)); ?>',
+                            <?php echo (int)$event['event_id']; ?>
+                        )">
+                        <strong><?php echo htmlspecialchars($event['event_name']); ?></strong>
+                        <p>
+                            <?php echo htmlspecialchars(date('M j, Y', strtotime($event['date']))); ?> 
+                            - <?php echo htmlspecialchars(substr($event['start_time'], 0, 5)); ?>
+                        </p>
                     </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+
+        <!-- event view -->
+        <div class="col-6" style="margin-left: 50px;"> 
+            <div class="event-popup" id="eventPopup">
+                <div class="event-header">
+                    <div class="event-image">🎈</div>
                     <div class="event-details">
                         <h2 id="popupTitle">Event Title</h2>
                         <p><strong>Date:</strong> <span id="popupDate"></span></p>
@@ -57,19 +83,19 @@
                         <button>Edit details</button>
                     </div>
                 </div>
+
                 <!-- Guest list -->
                 <div class="guest-list">
                     <h3>Guest List</h3>
                     <table>
-                        <tr>
-                            <th>Guest</th>
-                            <th>RSVP</th>
-                        </tr>
-                        <tbody>
-                        <tr><td>Person 1</td><td>Yes</td></tr>
-                        <tr><td>Person 2</td><td>No</td></tr>
-                        <tr><td>Person 3</td><td>Maybe</td></tr>
-                        <tr><td>Person 4</td><td>No response</td></tr>
+                        <thead>
+                            <tr>
+                                <th>Guest</th>
+                                <th>RSVP</th>
+                            </tr>
+                        </thead>
+                        <tbody id="guestTableBody">
+                            <tr><td colspan="2">Select an event to view guests</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -78,20 +104,43 @@
                     <button>Add guests</button>
                     <button>Send announcement</button>
                 </div>
-                </div>
             </div>
         </div>
+    </div>
 
-        <!-- Used ChatGPT to figure out how to change the event view based on which event is clicked on -->
-        <script>
-            function openEvent(title, date, time) {
+    <!-- Updated JS -->
+    <script>
+        function openEvent(title, date, time, eventId) {
             document.getElementById('popupTitle').textContent = title;
             document.getElementById('popupDate').textContent = date;
             document.getElementById('popupTime').textContent = time;
             document.getElementById('eventPopup').classList.add('active');
-            }
-        </script>
 
-    </body>   
-
-</html>    
+            // load guests dynamically
+            fetch(`get-guests.php?event_id=${eventId}`)
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.getElementById('guestTableBody');
+                    tbody.innerHTML = '';
+                    if (data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="2">No guests yet.</td></tr>';
+                    } else {
+                        data.forEach(g => {
+                            tbody.innerHTML += `
+                                <tr>
+                                    <td>${g.name}</td>
+                                    <td>${g.response}</td>
+                                </tr>
+                            `;
+                        });
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById('guestTableBody').innerHTML = 
+                        '<tr><td colspan="2" style="color:red;">Error loading guests</td></tr>';
+                });
+        }
+    </script>
+</body>
+</html>
