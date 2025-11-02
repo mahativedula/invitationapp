@@ -3,13 +3,13 @@
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: index.php?page=login");
+    header("Location: index.php?page=messages");
     exit();
 }
 
 $user_id = $_SESSION['user_id'];
 
-// Handle viewing status update via AJAX
+// Handle viewing status update 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     header('Content-Type: application/json');
     
@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         if ($message_id) {
             try {
                 $updateStmt = $db->prepare("
-                    UPDATE messages 
+                    UPDATE invitationapp_messages 
                     SET viewed = :viewed 
                     WHERE message_id = :message_id AND recipient_id = :user_id
                 ");
@@ -78,57 +78,6 @@ $messages = $stmt->fetchAll();
     <title>Messages</title>
     <link rel="stylesheet" href="styles/message.css" />
     <meta name="author" content="Fiona Fitzsimons">
-    <style>
-        /* Modal styles only */
-        .message-modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-        }
-        
-        .modal-content {
-            background-color: #fefefe;
-            margin: 10% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 60%;
-            max-width: 600px;
-            border-radius: 8px;
-            position: relative;
-        }
-        
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        
-        .close:hover,
-        .close:focus {
-            color: #000;
-        }
-        
-        .message-link {
-            color: #0066cc;
-            text-decoration: underline;
-            cursor: pointer;
-        }
-        
-        .message-link:hover {
-            text-decoration: underline;
-        }
-        
-        .unread {
-            font-weight: bold;
-        }
-    </style>
 </head>
 
 <body>
@@ -271,7 +220,7 @@ $messages = $stmt->fetchAll();
                         }
                     } else {
                         alert('Error updating message status');
-                        this.checked = !viewed; // Revert checkbox
+                        this.checked = !viewed; // Revert checkbox2
                     }
                 })
                 .catch(error => {
