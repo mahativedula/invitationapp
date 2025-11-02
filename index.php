@@ -47,6 +47,9 @@
         case 'sent':
             require 'sent.php';
             break;
+        case 'compose-message':
+            require 'compose-message.php';
+            break;
         default:
             header("Location: login.php");
             break;
