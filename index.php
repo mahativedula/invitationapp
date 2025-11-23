@@ -1,3 +1,5 @@
+//working link https://cs4640.cs.virginia.edu/kur2xk/invitationapp/index.php
+
 <?php
     // Start the session
     session_start();
@@ -45,6 +47,9 @@
             break;
         case 'sent':
             require 'sent.php';
+            break;
+        case 'compose-message':
+            require 'compose-message.php';
             break;
         default:
             header("Location: login.php");
