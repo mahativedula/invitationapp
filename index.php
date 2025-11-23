@@ -1,5 +1,4 @@
 <?php
-
     // Start the session
     session_start();
 
@@ -8,11 +7,11 @@
 
     try {
         $db = new PDO(
-        "pgsql:host=localhost;port=5432;dbname=COMPUTING_ID_HERE",
-        "COMPUTING_ID_HERE",
-        "phpgsql_password_here",
+        "pgsql:host=db;port=5432;dbname=invitationapp_db",
+        "localuser",
+        "cs4640LocalUser!",
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-        );
+      );  
     } catch (PDOException $e) {
         $error_message = "Error connecting to database: " . $e->getMessage();
         exit();
@@ -33,7 +32,7 @@
             require 'host-dashboard.php';
             break;
         case 'create-event':
-            require 'create-event.php';
+            require 'event-creation.php';
             break;    
         case 'delete-event':
             require 'delete-event.php';

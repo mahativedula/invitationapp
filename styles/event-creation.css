@@ -48,18 +48,36 @@
     width: 500px;
 }
 
-#event-image {
-    height: 45%;
-    width: 93%;
-    margin: 10px;
-    border: 2px solid black;
-}
-
 #event-details {
     padding: 10px;
     padding-top: 0px;
     height: 55%;
     width: 90%;
+}
+
+#event-name {
+    width: 100%;
+    overflow-wrap: break-word;
+}
+
+#description {
+    width: 100%;
+    overflow-wrap: break-word;
+}
+
+#date {
+    width: 100%;
+    overflow-wrap: break-word;
+}
+
+#time {
+    width: 100%;
+    overflow-wrap: break-word;
+}
+
+#location {
+    width: 100%;
+    overflow-wrap: break-word;
 }
 
 #template {

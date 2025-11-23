@@ -75,7 +75,6 @@
         <!-- Preview Section of Event Creation -->
         <div id="left-page">
             <div id="event-preview">
-                <img id="event-image" src="upload.jpg" alt="Event Image">
                 <div id="event-details">
                     <h2 id="event-name">Event Name</h2>
                     <p id="date">Date: mm/dd/yyyy</p>
@@ -128,5 +127,79 @@
             </form>
         </div>
         </div>
+        <script>
+            function handleNameInput() {
+                const nameInput = document.getElementById('event-name-input');
+                const previewName = document.getElementById('event-name');
+
+                previewName.textContent = nameInput.value || "Event Name";
+            }
+
+            function handleDescriptionInput() {
+                const descriptionInput = document.getElementById('description-input');
+                const description = document.getElementById('description');
+
+                description.textContent = descriptionInput.value || "Description";
+            }
+
+            function handleDateInput() {
+                const dateInput = document.getElementById('date-input');
+                const date = document.getElementById('date');
+                const raw = dateInput.value;
+
+                const [year, month, day] = raw.split("-");
+                const formatted = `${month}/${day}/${year}`;
+
+                date.textContent = "Date: " + formatted;
+            }
+
+            function handleTimeInput() {
+                const timeInput = document.getElementById('time-input');
+                const time = document.getElementById('time');
+                const raw = timeInput.value;
+
+                if (!raw) {
+                    time.textContent = "Time: --:--";
+                    return;
+                }
+
+                let [hour, minute] = raw.split(":");
+
+                hour = parseInt(hour);
+
+                const ampm = hour >= 12 ? "PM" : "AM";
+                let hour12 = hour % 12;
+                if (hour12 === 0) hour12 = 12;
+
+                const formatted = `${hour12}:${minute} ${ampm}`;
+
+                time.textContent = "Time: " + formatted;
+            }
+
+            function handleLocationInput() {
+                const locationInput = document.getElementById('location-input');
+                const location = document.getElementById('location');
+
+                location.textContent = "Location: " + locationInput.value;
+            }
+
+            function handleTemplateCarosoul() {
+                
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                const nameInput = document.getElementById('event-name-input');
+                const descriptionInput = document.getElementById('description-input');
+                const dateInput = document.getElementById('date-input');
+                const timeInput = document.getElementById('time-input');
+                const locationInput = document.getElementById('location-input');
+
+                nameInput.addEventListener('input', handleNameInput);
+                descriptionInput.addEventListener('input', handleDescriptionInput);
+                dateInput.addEventListener('input', handleDateInput);
+                timeInput.addEventListener('input', handleTimeInput);
+                locationInput.addEventListener('input', handleLocationInput);
+            });
+        </script>
     </body>
 </html>
