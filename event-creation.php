@@ -91,7 +91,7 @@
         </div>
         <!-- Form Input for Event Creation -->
         <div id="right-page">
-            <form method="POST" action="index.php?page=create-event">
+            <form method="POST" action="create-event.php">
                 <label for="event-name-input">Event Name:</label>
                 <input type="text" id="event-name-input" name="event_name" required>
                 <label for="description-input">Description:</label>
