@@ -1,5 +1,10 @@
 <?php
-// Database connection ($db) and session already available from index.php
+// Database connection ($db) and session already available from index.php - not anymore
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+require_once 'db-connect.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -59,7 +64,7 @@ $messages = $stmt->fetchAll();
         }
         
         .modal-content {
-            background-color: #fefefe;
+            background-color: white;
             margin: 10% auto;
             padding: 20px;
             border: 1px solid #888;
@@ -171,35 +176,59 @@ $messages = $stmt->fetchAll();
     </div>
 
     <script>
-        // Modal functionality
-        const modal = document.getElementById('messageModal');
-        const closeBtn = document.querySelector('.close');
-        
-        // Open modal when clicking message link
-        document.querySelectorAll('.message-link').forEach(link => {
-            link.addEventListener('click', function(e) {
+        // Self-invoking anonymous function to encapsulate modal logic
+        (function() {
+            const modal = document.getElementById('messageModal');
+            const closeBtn = document.querySelector('.close');
+            
+            // Arrow function for opening modal with event listener
+            const openModal = (e) => {
                 e.preventDefault();
                 
-                document.getElementById('modalSubject').textContent = this.dataset.subject;
-                document.getElementById('modalRecipient').textContent = this.dataset.recipient;
-                document.getElementById('modalDate').textContent = this.dataset.date;
-                document.getElementById('modalEvent').textContent = this.dataset.event;
-                document.getElementById('modalContent').textContent = this.dataset.content;
+                document.getElementById('modalSubject').textContent = e.currentTarget.dataset.subject;
+                document.getElementById('modalRecipient').textContent = e.currentTarget.dataset.recipient;
+                document.getElementById('modalDate').textContent = e.currentTarget.dataset.date;
+                document.getElementById('modalEvent').textContent = e.currentTarget.dataset.event;
+                document.getElementById('modalContent').textContent = e.currentTarget.dataset.content;
                 
                 modal.style.display = 'block';
+            };
+            
+            // Arrow function for closing modal
+            const closeModal = () => {
+                modal.style.display = 'none';
+            };
+            
+            // Open modal when clicking message link - using arrow function in forEach
+            document.querySelectorAll('.message-link').forEach(link => {
+                link.addEventListener('click', openModal);
             });
+            
+            // Close modal handlers
+            closeBtn.addEventListener('click', closeModal);
+            
+            window.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+        })();
+        
+        // Style modification on event - search box interactions
+        const searchInput = document.querySelector('input[name="search"]');
+        
+        searchInput.addEventListener('focus', function() {
+            this.style.backgroundColor = 'white';
+            this.style.borderColor = 'lightgreen';
+            this.style.boxShadow = '0 0 5px rgba(76, 175, 80, 0.5)';
+            this.style.transition = 'all 0.3s ease';
         });
         
-        // Close modal
-        closeBtn.onclick = function() {
-            modal.style.display = 'none';
-        }
-        
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = 'none';
-            }
-        }
+        searchInput.addEventListener('blur', function() {
+            this.style.backgroundColor = '';
+            this.style.borderColor = '';
+            this.style.boxShadow = '';
+        });
     </script>
 </body>
 </html>
