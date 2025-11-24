@@ -1,5 +1,10 @@
 <?php
-// Database connection ($db) and session already available from index.php
+// Database connection ($db) and session already available from index.php - UPDATE BASED on Mahati changes
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+require_once 'db-connect.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -164,69 +169,80 @@ $messages = $stmt->fetchAll();
         </div>
     </div>
 
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        // Modal functionality
-        const modal = document.getElementById('messageModal');
-        const closeBtn = document.querySelector('.close');
-        
-        // Open modal when clicking message link
-        document.querySelectorAll('.message-link').forEach(link => {
-            link.addEventListener('click', function(e) {
+        // Using jQuery for all interactions on this page
+        $(document).ready(function() {
+            // Modal functionality with jQuery animations
+            $('.message-link').on('click', function(e) {
                 e.preventDefault();
                 
-                document.getElementById('modalSubject').textContent = this.dataset.subject;
-                document.getElementById('modalSender').textContent = this.dataset.sender;
-                document.getElementById('modalDate').textContent = this.dataset.date;
-                document.getElementById('modalEvent').textContent = this.dataset.event;
-                document.getElementById('modalContent').textContent = this.dataset.content;
+                $('#modalSubject').text($(this).data('subject'));
+                $('#modalSender').text($(this).data('sender'));
+                $('#modalDate').text($(this).data('date'));
+                $('#modalEvent').text($(this).data('event'));
+                $('#modalContent').text($(this).data('content'));
                 
-                modal.style.display = 'block';
+                $('#messageModal').fadeIn(300);
             });
-        });
-        
-        // Close modal
-        closeBtn.onclick = function() {
-            modal.style.display = 'none';
-        }
-        
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = 'none';
-            }
-        }
-        
-        // Handle viewed checkbox changes
-        document.querySelectorAll('.viewed-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const messageId = this.dataset.messageId;
-                const viewed = this.checked;
+            
+            // Close modal
+            $('.close').on('click', function() {
+                $('#messageModal').fadeOut(300);
+            });
+            
+            $(window).on('click', function(event) {
+                if ($(event.target).is('#messageModal')) {
+                    $('#messageModal').fadeOut(300);
+                }
+            });
+            
+            // Handle viewed checkbox changes with jQuery AJAX
+            $('.viewed-checkbox').on('change', function() {
+                const $checkbox = $(this);
+                const messageId = $checkbox.data('message-id');
+                const viewed = $checkbox.is(':checked');
                 
-                fetch('index.php?page=messages', {
+                $.ajax({
+                    url: 'index.php?page=messages',
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
+                    data: {
+                        action: 'toggle_viewed',
+                        message_id: messageId,
+                        viewed: viewed
                     },
-                    body: `action=toggle_viewed&message_id=${messageId}&viewed=${viewed}`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Update row styling
-                        const row = this.closest('tr');
-                        if (viewed) {
-                            row.classList.remove('unread');
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.success) {
+                            const $row = $checkbox.closest('tr');
+                            if (viewed) {
+                                $row.removeClass('unread').fadeOut(100).fadeIn(100);
+                            } else {
+                                $row.addClass('unread').fadeOut(100).fadeIn(100);
+                            }
                         } else {
-                            row.classList.add('unread');
+                            alert('Error updating message status');
+                            $checkbox.prop('checked', !viewed);
                         }
-                    } else {
-                        alert('Error updating message status');
-                        this.checked = !viewed; // Revert checkbox2
+                    },
+                    error: function() {
+                        alert('An error occurred');
+                        $checkbox.prop('checked', !viewed);
                     }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred');
-                    this.checked = !viewed; // Revert checkbox
+                });
+            });
+            
+            // Search box enhancement with jQuery (style modification on event)
+            $('input[name="search"]').on('focus', function() {
+                $(this).css({
+                    'background-color': 'white',
+                    'border-color': 'lightgreen'
+                });
+            }).on('blur', function() {
+                $(this).css({
+                    'background-color': '',
+                    'border-color': ''
                 });
             });
         });
