@@ -80,6 +80,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Compose Message</title>
     <link rel="stylesheet" href="styles/compose.css" />
     <meta name="author" content="Fiona Fitzsimons">
+    <style>
+        .error-text {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 5px;
+            display: none;
+        }
+        .char-counter {
+            text-align: right;
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+        .input-valid {
+            border-color: green !important;
+        }
+        .input-invalid {
+            border-color: red !important;
+        }
+    </style>
 </head>
 
 <body>
@@ -125,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <?php endif; ?>
         
-        <form method="POST" action="index.php?page=compose-message<?php echo $event_id ? '&event_id=' . $event_id : ''; ?>">
+        <form method="POST" id="composeForm" action="index.php?page=compose-message<?php echo $event_id ? '&event_id=' . $event_id : ''; ?>">
             <div class="form-group">
                 <label for="recipient_id">To:</label>
                 <select name="recipient_id" id="recipient_id" required <?php echo $recipient ? 'disabled' : ''; ?>>
@@ -140,6 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php if ($recipient): ?>
                 <input type="hidden" name="recipient_id" value="<?php echo $recipient['user_id']; ?>">
                 <?php endif; ?>
+                <div class="error-text" id="recipientError"></div>
             </div>
             
             <?php if ($event): ?>
@@ -153,17 +174,166 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-group">
                 <label for="subject">Subject:</label>
                 <input type="text" name="subject" id="subject" maxlength="100" required>
+                <div class="error-text" id="subjectError"></div>
             </div>
             
             <div class="form-group">
                 <label for="content">Message:</label>
                 <textarea name="content" id="content" maxlength="5000" required></textarea>
+                <div class="char-counter" id="charCounter">5000 characters remaining</div>
+                <div class="error-text" id="contentError"></div>
             </div>
             
             <button type="submit" class="btn-submit">Send Message</button>
             <button type="button" class="btn-cancel" onclick="window.history.back()">Cancel</button>
         </form>
     </div>
+
+    <script>
+        // JavaScript object to manage form validation
+        const formValidator = {
+            form: document.getElementById('composeForm'),
+            recipientSelect: document.getElementById('recipient_id'),
+            subjectInput: document.getElementById('subject'),
+            contentInput: document.getElementById('content'),
+            errors: {
+                recipient: document.getElementById('recipientError'),
+                subject: document.getElementById('subjectError'),
+                content: document.getElementById('contentError')
+            },
+            
+            // Arrow function to validate recipient
+            validateRecipient: () => {
+                const isValid = formValidator.recipientSelect.value !== '';
+                if (!isValid) {
+                    formValidator.errors.recipient.textContent = 'Please select a recipient';
+                    formValidator.errors.recipient.style.display = 'block';
+                    formValidator.recipientSelect.classList.add('input-invalid');
+                    formValidator.recipientSelect.classList.remove('input-valid');
+                } else {
+                    formValidator.errors.recipient.style.display = 'none';
+                    formValidator.recipientSelect.classList.add('input-valid');
+                    formValidator.recipientSelect.classList.remove('input-invalid');
+                }
+                return isValid;
+            },
+            
+            // Arrow function to validate subject
+            validateSubject: () => {
+                const value = formValidator.subjectInput.value.trim();
+                let isValid = true;
+                let errorMsg = '';
+                
+                if (value.length === 0) {
+                    isValid = false;
+                    errorMsg = 'Subject cannot be empty';
+                } else if (value.length < 3) {
+                    isValid = false;
+                    errorMsg = 'Subject must be at least 3 characters';
+                }
+                
+                // DOM manipulation - update error message
+                if (!isValid) {
+                    formValidator.errors.subject.textContent = errorMsg;
+                    formValidator.errors.subject.style.display = 'block';
+                    formValidator.subjectInput.classList.add('input-invalid');
+                    formValidator.subjectInput.classList.remove('input-valid');
+                } else {
+                    formValidator.errors.subject.style.display = 'none';
+                    formValidator.subjectInput.classList.add('input-valid');
+                    formValidator.subjectInput.classList.remove('input-invalid');
+                }
+                return isValid;
+            },
+            
+            // Arrow function to validate content
+            validateContent: () => {
+                const value = formValidator.contentInput.value.trim();
+                let isValid = true;
+                let errorMsg = '';
+                
+                if (value.length === 0) {
+                    isValid = false;
+                    errorMsg = 'Message cannot be empty';
+                } else if (value.length < 10) {
+                    isValid = false;
+                    errorMsg = 'Message must be at least 10 characters';
+                }
+                
+                // DOM manipulation - update error message
+                if (!isValid) {
+                    formValidator.errors.content.textContent = errorMsg;
+                    formValidator.errors.content.style.display = 'block';
+                    formValidator.contentInput.classList.add('input-invalid');
+                    formValidator.contentInput.classList.remove('input-valid');
+                } else {
+                    formValidator.errors.content.style.display = 'none';
+                    formValidator.contentInput.classList.add('input-valid');
+                    formValidator.contentInput.classList.remove('input-invalid');
+                }
+                return isValid;
+            },
+            
+            // Validate entire form
+            validateForm: function() {
+                const recipientValid = this.validateRecipient();
+                const subjectValid = this.validateSubject();
+                const contentValid = this.validateContent();
+                
+                return recipientValid && subjectValid && contentValid;
+            }
+        };
+        
+        // Event listener for form submission - client-side validation
+        formValidator.form.addEventListener('submit', function(e) {
+            if (!formValidator.validateForm()) {
+                e.preventDefault();
+                alert('Please fix the errors before submitting');
+            }
+        });
+        
+        // Event listener 
+        formValidator.recipientSelect.addEventListener('change', formValidator.validateRecipient);
+        formValidator.subjectInput.addEventListener('input', formValidator.validateSubject);
+        formValidator.contentInput.addEventListener('input', formValidator.validateContent);
+        
+        // Character counter with DOM manipulation
+        const charCounter = document.getElementById('charCounter');
+        formValidator.contentInput.addEventListener('input', function() {
+            const remaining = 5000 - this.value.length;
+            charCounter.textContent = `${remaining} characters remaining`;
+            
+            // Style modification on event 
+            if (remaining < 100) {
+                charCounter.style.color = 'red';
+                charCounter.style.fontWeight = 'bold';
+            } else if (remaining < 500) {
+                charCounter.style.color = 'orange';
+                charCounter.style.fontWeight = 'normal';
+            } else {
+                charCounter.style.color = '#666';
+                charCounter.style.fontWeight = 'normal';
+            }
+        });
+        
+        // Style modification on event - button hover effects
+        const submitBtn = document.querySelector('.btn-submit');
+        const cancelBtn = document.querySelector('.btn-cancel');
+        
+        const addHoverEffect = (button) => {
+            button.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05)';
+                this.style.transition = 'transform 0.2s ease';
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        };
+        
+        addHoverEffect(submitBtn);
+        addHoverEffect(cancelBtn);
+    </script>
 </body>
 </html>
 
