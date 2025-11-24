@@ -19,11 +19,11 @@ if (!isset($_SESSION['user_id'])) {
 /**
  * Validate event form input
  */
-function validate_event_data($event_name, $date, $time, $location, $guests) {
+function validate_event_data($event_name, $date, $start_time, $location, $guests) {
     $errors = [];
 
     // basic required field check
-    if (empty($event_name) || empty($date) || empty($time) || empty($location)) {
+    if (empty($event_name) || empty($date) || empty($start_time) || empty($location)) {
         $errors[] = "Please fill out all required fields.";
     }
 
@@ -54,17 +54,18 @@ function validate_event_data($event_name, $date, $time, $location, $guests) {
 /**
  * Insert a new event and return its ID
  */
-function create_event($db, $host_id, $event_name, $date, $time, $location, $description) {
+function create_event($db, $host_id, $event_name, $date, $start_time, $end_time, $location, $description) {
     $stmt = $db->prepare("
-        INSERT INTO invitationapp_events (host_id, event_name, date, start_time, location, description)
-        VALUES (:host_id, :event_name, :date, :start_time, :location, :description)
+        INSERT INTO invitationapp_events (host_id, event_name, date, start_time, end_time, location, description)
+        VALUES (:host_id, :event_name, :date, :start_time, :end_time, :location, :description)
         RETURNING event_id;
     ");
     $stmt->execute([
         ':host_id' => $host_id,
         ':event_name' => $event_name,
         ':date' => $date,
-        ':start_time' => $time,
+        ':start_time' => $start_time,
+        ':end_time' => $end_time,
         ':location' => $location,
         ':description' => $description
     ]);
@@ -113,14 +114,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $event_name = trim($_POST['event_name'] ?? '');
     $description = trim($_POST['description'] ?? '');
     $date = $_POST['date'] ?? '';
-    $time = $_POST['time'] ?? '';
+    $start_time = $_POST['time'] ?? '';
+    $end_time = $_POST['end_time'] ?? '';
     $location = trim($_POST['location'] ?? '');
     $host_id = $_SESSION['user_id'];
     $guest_data_json = $_POST['guest_data'] ?? '[]';
     $guests = json_decode($guest_data_json, true);
 
+    // Convert empty end_time to null
+    if (empty($end_time)) {
+        $end_time = null;
+    }
+
     // 1️⃣ validate
-    $errors = validate_event_data($event_name, $date, $time, $location, $guests);
+    $errors = validate_event_data($event_name, $date, $start_time, $location, $guests);
+    
     if (!empty($errors)) {
         display_errors($errors);
         exit;
@@ -130,7 +138,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $db->beginTransaction();
 
         // 2️⃣ create event
-        $event_id = create_event($db, $host_id, $event_name, $date, $time, $location, $description);
+        $event_id = create_event($db, $host_id, $event_name, $date, $start_time, $end_time, $location, $description);
 
         // 3️⃣ add RSVPs
         invite_registered_guests($db, $event_id, $guests);
@@ -147,4 +155,3 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         echo "<p style='color:red;'>Error creating event: " . htmlspecialchars($e->getMessage()) . "</p>";
     }
 }
-?>

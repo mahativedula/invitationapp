@@ -50,7 +50,7 @@
             require 'settings.php'; 
             break;
         default:
-            header("Location: ?page=login");
+            header("Location: login.php");
             exit();
             break;
     }

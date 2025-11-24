@@ -91,7 +91,7 @@
         </div>
         <!-- Form Input for Event Creation -->
         <div id="right-page">
-            <form method="POST" action="index.php?page=create-event">
+            <form method="POST" action="create-event.php">
                 <label for="event-name-input">Event Name:</label>
                 <input type="text" id="event-name-input" name="event_name" required>
                 <label for="description-input">Description:</label>
@@ -99,8 +99,12 @@
                 <div id="form-date-time">
                     <label for="date-input">Date:</label>
                     <input type="date" id="date-input" name="date" required>
-                    <label for="time-input">Time:</label>
+
+                    <label for="time-input">Start Time:</label>
                     <input type="time" id="time-input" name="time" required>
+                    
+                    <label for="end-time-input">End Time:</label>
+                    <input type="time" id="end-time-input" name="end_time">
                 </div>
                 <label for="location-input">Location:</label>
                 <input type="text" id="location-input" name="location" required>
@@ -152,28 +156,40 @@
 
                 date.textContent = "Date: " + formatted;
             }
-
             function handleTimeInput() {
                 const timeInput = document.getElementById('time-input');
-                const time = document.getElementById('time');
-                const raw = timeInput.value;
+                const endTimeInput = document.getElementById('end-time-input');
+                const timeDisplay = document.getElementById('time');
+                const startRaw = timeInput.value;
+                const endRaw = endTimeInput.value;
 
-                if (!raw) {
-                    time.textContent = "Time: --:--";
+                // If no start time, show placeholder
+                if (!startRaw) {
+                    timeDisplay.textContent = "Time: --:--";
                     return;
                 }
 
-                let [hour, minute] = raw.split(":");
+                // Format start time
+                let [startHour, startMinute] = startRaw.split(":");
+                startHour = parseInt(startHour);
+                const startAmpm = startHour >= 12 ? "PM" : "AM";
+                let startHour12 = startHour % 12;
+                if (startHour12 === 0) startHour12 = 12;
+                const startFormatted = `${startHour12}:${startMinute} ${startAmpm}`;
 
-                hour = parseInt(hour);
-
-                const ampm = hour >= 12 ? "PM" : "AM";
-                let hour12 = hour % 12;
-                if (hour12 === 0) hour12 = 12;
-
-                const formatted = `${hour12}:${minute} ${ampm}`;
-
-                time.textContent = "Time: " + formatted;
+                // If end time exists, show range; otherwise just start time
+                if (endRaw) {
+                    let [endHour, endMinute] = endRaw.split(":");
+                    endHour = parseInt(endHour);
+                    const endAmpm = endHour >= 12 ? "PM" : "AM";
+                    let endHour12 = endHour % 12;
+                    if (endHour12 === 0) endHour12 = 12;
+                    const endFormatted = `${endHour12}:${endMinute} ${endAmpm}`;
+                    
+                    timeDisplay.textContent = `Time: ${startFormatted} - ${endFormatted}`;
+                } else {
+                    timeDisplay.textContent = `Time: ${startFormatted}`;
+                }
             }
 
             function handleLocationInput() {
@@ -192,12 +208,14 @@
                 const descriptionInput = document.getElementById('description-input');
                 const dateInput = document.getElementById('date-input');
                 const timeInput = document.getElementById('time-input');
+                const endTimeInput = document.getElementById('end-time-input');
                 const locationInput = document.getElementById('location-input');
 
                 nameInput.addEventListener('input', handleNameInput);
                 descriptionInput.addEventListener('input', handleDescriptionInput);
                 dateInput.addEventListener('input', handleDateInput);
                 timeInput.addEventListener('input', handleTimeInput);
+                endTimeInput.addEventListener('input', handleTimeInput);
                 locationInput.addEventListener('input', handleLocationInput);
 
                 const templateLabel = document.getElementById('template-label');
