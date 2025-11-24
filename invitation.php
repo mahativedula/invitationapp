@@ -1,4 +1,10 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+require_once 'db-connect.php';
+
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: index.php?page=invitation");
@@ -42,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if ($rsvp_id && $response && in_array($response, ['Going', 'Not Going', 'Maybe'])) {
         try {
             $updateStmt = $db->prepare("
-                UPDATE rsvps 
+                UPDATE invitationapp_rsvps 
                 SET response = :response, responded_at = CURRENT_TIMESTAMP 
                 WHERE rsvp_id = :rsvp_id AND recipient_id = :user_id
             ");
@@ -76,12 +82,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     <!-- HEADER -->
     <br>
     <div class="navbar">
-        <a href="event-creation.php">Create Event</a>
-        <a href="host-dashboard.php">My Events</a>
-        <a href="invitation.php">My Invites</a>
-        <a href="message.php">Messages</a>
-        <a href="settings.php">Settings</a>
-        <a href="login.php">Logout</a>
+        <a href="index.php?page=create-event">Create Event</a>
+        <a href="index.php?page=host-dashboard">My Events</a>
+        <a href="index.php?page=invitation">My Invites</a>
+        <a href="index.php?page=messages">Messages</a>
+        <a href="settings.html">Settings</a>
+        <a href="index.php?page=login">Logout</a>
     </div>
     <br>
     <br>
@@ -124,7 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 </select>
             </td>
             <td>
-                <a href="compose-message.php?recipient_id=<?php echo $invite['host_id']; ?>&event_id=<?php echo $invite['event_id']; ?>">
+                <a href="index.php?page=compose-message&recipient_id=<?php echo $invite['host_id']; ?>&event_id=<?php echo $invite['event_id']; ?>">
                     <button class="message-btn">
                         <?php echo htmlspecialchars($invite['host_first_name'] . ' ' . $invite['host_last_name']); ?>
                     </button>
@@ -136,32 +142,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     </table>
 
     <script>
-        // Handle RSVP changes
+        // Arrow function to handle RSVP changes with AJAX
+        const updateRSVP = (rsvpId, response, selectElement, row) => {
+            fetch('index.php?page=invitation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `action=update_rsvp&rsvp_id=${rsvpId}&response=${encodeURIComponent(response)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // DOM manipulation - visual feedback with style change
+                    row.style.backgroundColor = '#d4edda';
+                    setTimeout(() => {
+                        row.style.backgroundColor = '';
+                    }, 1000);
+                    console.log('RSVP updated successfully');
+                } else {
+                    alert('Error updating RSVP: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating your RSVP');
+            });
+        };
+        
+        // Event listener for RSVP select changes
         document.querySelectorAll('.rsvp-select').forEach(select => {
             select.addEventListener('change', function() {
                 const rsvpId = this.dataset.rsvpId;
                 const response = this.value;
+                const row = this.closest('tr');
                 
-                fetch('invitation.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `action=update_rsvp&rsvp_id=${rsvpId}&response=${encodeURIComponent(response)}`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Optional: Show success message
-                        console.log('RSVP updated successfully');
-                    } else {
-                        alert('Error updating RSVP: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while updating your RSVP');
-                });
+                updateRSVP(rsvpId, response, this, row);
+            });
+        });
+        
+        // Style modification on event - button hover effects using arrow functions
+        document.querySelectorAll('.message-btn').forEach(btn => {
+            btn.addEventListener('mouseenter', () => {
+                btn.style.transform = 'scale(1.05)';
+                btn.style.transition = 'transform 0.2s ease';
+                btn.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+            });
+            
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'scale(1)';
+                btn.style.boxShadow = '';
+            });
+        });
+        
+        // Style modification on event - RSVP select focus
+        document.querySelectorAll('.rsvp-select').forEach(select => {
+            select.addEventListener('focus', function() {
+                this.style.borderColor = 'lightgreen';
+                this.style.boxShadow = '0 0 5px rgba(76, 175, 80, 0.5)';
+            });
+            
+            select.addEventListener('blur', function() {
+                this.style.borderColor = '';
+                this.style.boxShadow = '';
             });
         });
     </script>
