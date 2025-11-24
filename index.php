@@ -1,23 +1,18 @@
-//working link https://cs4640.cs.virginia.edu/kur2xk/invitationapp/index.php
 
 <?php
+
+    // working link https://cs4640.cs.virginia.edu/kur2xk/invitationapp/
+    // working link https://cs4640.cs.virginia.edu/nsc3sj/invitationapp/
+    // working link https://cs4640.cs.virginia.edu/xyx4pf/invitationapp/
+
+
     // Start the session
-    session_start();
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
 
     // Database connection
-    $error_message = '';
-
-    try {
-        $db = new PDO(
-        "pgsql:host=db;port=5432;dbname=invitationapp_db",
-        "localuser",
-        "cs4640LocalUser!",
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-      );  
-    } catch (PDOException $e) {
-        $error_message = "Error connecting to database: " . $e->getMessage();
-        exit();
-    }
+    require_once 'db-connect.php';
 
     // Login page redirection
     $page = $_GET['page'] ?? 'login';
@@ -52,7 +47,8 @@
             require 'compose-message.php';
             break;
         default:
-            header("Location: login.php");
+            header("Location: ?page=login");
+            exit();
             break;
     }
 ?>
