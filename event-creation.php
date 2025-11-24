@@ -85,7 +85,7 @@
             </div>
             <div id="template">
                 <button class="arrow">&lt</button>
-                <p>Choose a Template</p>
+                <p id="template-label">Choose a Template</p>
                 <button class="arrow">&gt</button>
             </div>
         </div>
@@ -199,6 +199,44 @@
                 dateInput.addEventListener('input', handleDateInput);
                 timeInput.addEventListener('input', handleTimeInput);
                 locationInput.addEventListener('input', handleLocationInput);
+
+                const templateLabel = document.getElementById('template-label');
+                const preview = document.getElementById('event-preview');
+                const eventDetails = document.getElementById('event-details');
+                const arrows = document.querySelectorAll('#template .arrow');
+
+                const templates = [
+                    { name: 'Classic', bg: '#ffffff', text: '#000000' },
+                    { name: 'Ocean', bg: '#bfe9ff', text: '#00334d' },
+                    { name: 'Sunset', bg: '#ffd8b3', text: '#4b2600' },
+                    { name: 'Mint', bg: '#dfffe6', text: '#00331a' },
+                    { name: 'Lavender', bg: '#f0e6ff', text: '#2b0033' }
+                ];
+
+                let currentTemplate = 0;
+
+                function applyTemplate(index) {
+                    const t = templates[index];
+                    preview.style.backgroundColor = t.bg;
+                    eventDetails.style.color = t.text;
+                    templateLabel.textContent = t.name + ' Template';
+                }
+
+                if (arrows.length >= 2) {
+                    arrows[0].addEventListener('click', function(e) {
+                        e.preventDefault();
+                        currentTemplate = (currentTemplate - 1 + templates.length) % templates.length;
+                        applyTemplate(currentTemplate);
+                    });
+
+                    arrows[1].addEventListener('click', function(e) {
+                        e.preventDefault();
+                        currentTemplate = (currentTemplate + 1) % templates.length;
+                        applyTemplate(currentTemplate);
+                    });
+                }
+
+                applyTemplate(currentTemplate);
             });
         </script>
     </body>
