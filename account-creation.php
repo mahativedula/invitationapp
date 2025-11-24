@@ -32,7 +32,7 @@
 
             try {
                 $stmt->execute();
-                header("Location: index.php?page=host-dashboard");
+                header("Location: index.php?page=login");
                 exit();
             } catch (PDOException $e) {
                 if ($e->getCode() == 23505) { // Unique violation

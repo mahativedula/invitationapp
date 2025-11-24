@@ -6,7 +6,9 @@ This sprint, we added functionality to...
 - delete an event
 - view hosted events
 - view and RSVP to invites
-- message the host with a question or comment
+- compose, send, and view messages to/from other users
+
+**NOTE** the send message button under "My Invites" --> "Message Host" doesn't have logic implemented yet but the messages can be manually inserted via SQL. We plan to make the button work next sprint.
 
 =====================================================================================
 
@@ -21,6 +23,8 @@ password: Abcd1234
 
 username: jackie_doe
 password: Abcd1234
+
+Messages received by Jackie, Jane, and John. 
 
 =====================================================================================
 
