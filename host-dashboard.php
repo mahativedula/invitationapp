@@ -161,7 +161,7 @@ function formatTimeRange($start_time, $end_time) {
                 </div>
 
                 <div class="buttons">
-                    <button>Add guests</button>
+                    <button onclick="openAddGuestsModal()">Add guests</button>
                     <button onclick="openAnnouncementModal()">Send announcement</button>
                     <form method="POST" style="display:inline;">
                         <input type="hidden" name="action" value="delete">
@@ -260,6 +260,40 @@ function formatTimeRange($start_time, $end_time) {
                 <div class="modal-buttons">
                     <button type="button" class="btn-cancel" onclick="closeAnnouncementModal()">Cancel</button>
                     <button type="submit" class="btn-save">Send Announcement</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Guests Modal -->
+    <div id="addGuestsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddGuestsModal()">&times;</span>
+            <h2>Add Guests</h2>
+            <form id="addGuestsForm" class="modal-form">
+                <input type="hidden" id="addGuestsEventId" name="event_id">
+                
+                <div id="newGuestsList" style="margin-bottom: 20px; max-height: 200px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px; padding: 10px;">
+                    <p style="color: #666; font-style: italic;">No guests added yet. Use the form below to add guests.</p>
+                </div>
+                
+                <div style="border-top: 1px solid #ddd; padding-top: 15px;">
+                    <label for="guestName">Guest Name:</label>
+                    <input type="text" id="guestName" placeholder="e.g. Jane Doe">
+                    
+                    <label for="guestEmail">Guest Email:</label>
+                    <input type="email" id="guestEmail" placeholder="e.g. jane@example.com">
+                    
+                    <button type="button" onclick="addGuestToList()" style="margin-top: 10px; padding: 8px 15px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        + Add to List
+                    </button>
+                </div>
+                
+                <input type="hidden" id="guestsData" name="guests_data">
+                
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel" onclick="closeAddGuestsModal()">Cancel</button>
+                    <button type="submit" class="btn-save">Invite Guests</button>
                 </div>
             </form>
         </div>
@@ -453,10 +487,155 @@ function formatTimeRange($start_time, $end_time) {
             });
         });
 
+        // Add Guests Modal Functions
+        let newGuestsList = [];
+
+        function openAddGuestsModal() {
+            if (!currentEventId) return;
+            
+            document.getElementById('addGuestsEventId').value = currentEventId;
+            newGuestsList = []; // Reset the list
+            updateNewGuestsList();
+            document.getElementById('addGuestsModal').style.display = 'block';
+        }
+
+        function closeAddGuestsModal() {
+            document.getElementById('addGuestsModal').style.display = 'none';
+            document.getElementById('addGuestsForm').reset();
+            newGuestsList = [];
+            updateNewGuestsList();
+        }
+
+        function addGuestToList() {
+            const nameInput = document.getElementById('guestName');
+            const emailInput = document.getElementById('guestEmail');
+            
+            const name = nameInput.value.trim();
+            const email = emailInput.value.trim();
+            
+            if (!name || !email) {
+                alert('Please enter both name and email.');
+                return;
+            }
+            
+            // Basic email validation
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(email)) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+            
+            // Check for duplicates
+            if (newGuestsList.some(g => g.email === email)) {
+                alert('This email has already been added to the list.');
+                return;
+            }
+            
+            // Add to list
+            newGuestsList.push({ name, email });
+            
+            // Update display
+            updateNewGuestsList();
+            
+            // Clear inputs
+            nameInput.value = '';
+            emailInput.value = '';
+            nameInput.focus();
+        }
+
+        function updateNewGuestsList() {
+            const listDiv = document.getElementById('newGuestsList');
+            
+            if (newGuestsList.length === 0) {
+                listDiv.innerHTML = '<p style="color: #666; font-style: italic;">No guests added yet. Use the form below to add guests.</p>';
+            } else {
+                listDiv.innerHTML = newGuestsList.map((guest, index) => `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #eee;">
+                        <div>
+                            <strong>${guest.name}</strong><br>
+                            <small style="color: #666;">${guest.email}</small>
+                        </div>
+                        <button type="button" onclick="removeGuestFromList(${index})" style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">
+                            Remove
+                        </button>
+                    </div>
+                `).join('');
+            }
+            
+            // Update hidden input with JSON data
+            document.getElementById('guestsData').value = JSON.stringify(newGuestsList);
+        }
+
+        function removeGuestFromList(index) {
+            newGuestsList.splice(index, 1);
+            updateNewGuestsList();
+        }
+
+        // Handle add guests form submission
+        document.getElementById('addGuestsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (newGuestsList.length === 0) {
+                alert('Please add at least one guest before submitting.');
+                return;
+            }
+            
+            const formData = new FormData(this);
+            
+            // Show loading state
+            const submitBtn = this.querySelector('.btn-save');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Adding...';
+            submitBtn.disabled = true;
+            
+            fetch('add-guests.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    let message = `Successfully added ${data.added_count} guest(s)!`;
+                    
+                    if (data.skipped_count > 0) {
+                        message += `\n\n${data.skipped_count} guest(s) were already invited.`;
+                    }
+                    
+                    if (data.not_registered && data.not_registered.length > 0) {
+                        message += `\n\nWarning: The following email(s) are not registered users and were NOT added:\n`;
+                        message += data.not_registered.join('\n');
+                        message += '\n\nOnly registered users can be invited to events.';
+                    }
+                    alert(message);
+                    closeAddGuestsModal();
+                    // Reload guest list
+                    openEvent(
+                        document.getElementById('popupTitle').textContent,
+                        document.getElementById('popupDate').textContent,
+                        document.getElementById('popupTime').textContent,
+                        document.getElementById('popupLocation').textContent,
+                        document.getElementById('popupDescription').textContent,
+                        currentEventId
+                    );
+                } else {
+                    alert('Error adding guests: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error adding guests. Please try again.');
+            })
+            .finally(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+
         // Close modals when clicking outside
         window.onclick = function(event) {
             const editModal = document.getElementById('editModal');
             const announcementModal = document.getElementById('announcementModal');
+            const addGuestsModal = document.getElementById('addGuestsModal');
             
             if (event.target == editModal) {
                 closeEditModal();
@@ -464,8 +643,10 @@ function formatTimeRange($start_time, $end_time) {
             if (event.target == announcementModal) {
                 closeAnnouncementModal();
             }
+            if (event.target == addGuestsModal) {
+                closeAddGuestsModal();
+            }
         }
-
     </script>
 
     <script>
