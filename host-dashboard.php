@@ -1,4 +1,7 @@
 <?php
+
+// In this file, I used AI (Claude) to help write the code for the pop-up windows/modal because it is not an element we learned about in class.
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -12,7 +15,7 @@ if (!isset($_SESSION['user_id'])) {
 $host_id = $_SESSION['user_id'];
 
 // --- Handle deletion if form submitted ---
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['event_id'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['event_id']) && isset($_POST['action']) && $_POST['action'] === 'delete') {
     $event_id = (int) $_POST['event_id'];
 
     try {
@@ -159,8 +162,9 @@ function formatTimeRange($start_time, $end_time) {
 
                 <div class="buttons">
                     <button>Add guests</button>
-                    <button>Send announcement</button>
+                    <button onclick="openAnnouncementModal()">Send announcement</button>
                     <form method="POST" style="display:inline;">
+                        <input type="hidden" name="action" value="delete">
                         <input type="hidden" id="deleteEventId" name="event_id">
                         <button type="submit" id="deleteButton" onclick="return confirm('Are you sure you want to delete this event?')">
                             Delete Event
@@ -206,6 +210,56 @@ function formatTimeRange($start_time, $end_time) {
                 <div class="modal-buttons">
                     <button type="button" class="btn-cancel" onclick="closeEditModal()">Cancel</button>
                     <button type="submit" class="btn-save">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Send Announcement Modal -->
+    <div id="announcementModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAnnouncementModal()">&times;</span>
+            <h2>Send Announcement</h2>
+            <form id="announcementForm" class="modal-form">
+                <input type="hidden" id="announcementEventId" name="event_id">
+                
+                <label>Send to:</label>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin: 5px 0; font-weight: normal;">
+                        <input type="radio" name="recipient_filter" value="all" checked>
+                        All guests
+                    </label>
+                    <label style="display: block; margin: 5px 0; font-weight: normal;">
+                        <input type="radio" name="recipient_filter" value="going">
+                        Only guests going
+                    </label>
+                    <label style="display: block; margin: 5px 0; font-weight: normal;">
+                        <input type="radio" name="recipient_filter" value="not_going">
+                        Only guests not going
+                    </label>
+                    <label style="display: block; margin: 5px 0; font-weight: normal;">
+                        <input type="radio" name="recipient_filter" value="maybe">
+                        Only guests who selected "Maybe"
+                    </label>
+                    <label style="display: block; margin: 5px 0; font-weight: normal;">
+                        <input type="radio" name="recipient_filter" value="no_response">
+                        Only guests who haven't responded
+                    </label>
+                </div>
+                
+                <label for="announcementSubject">Subject:</label>
+                <input type="text" id="announcementSubject" name="subject" maxlength="100" required placeholder="e.g. Important update about the event">
+                
+                <label for="announcementContent">Message:</label>
+                <textarea id="announcementContent" name="content" maxlength="5000" required placeholder="Write your announcement here..." style="min-height: 150px;"></textarea>
+                
+                <p style="font-size: 12px; color: #666; margin-top: 5px;">
+                    <span id="recipientCount">Loading recipients...</span>
+                </p>
+                
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel" onclick="closeAnnouncementModal()">Cancel</button>
+                    <button type="submit" class="btn-save">Send Announcement</button>
                 </div>
             </form>
         </div>
@@ -318,13 +372,99 @@ function formatTimeRange($start_time, $end_time) {
             });
         });
 
-        // After the page loads, automatically open the first event (if it exists)
-        document.addEventListener('DOMContentLoaded', function() {
-            const firstEventDiv = document.getElementById('first-event');
-            if (firstEventDiv) {
-                firstEventDiv.click();
-            }
+        // Announcement Modal Functions
+        function openAnnouncementModal() {
+            if (!currentEventId) return;
+            
+            document.getElementById('announcementEventId').value = currentEventId;
+            document.getElementById('announcementModal').style.display = 'block';
+            
+            // Update recipient count when filter changes
+            updateRecipientCount();
+            
+            // Add event listeners for radio buttons
+            document.querySelectorAll('input[name="recipient_filter"]').forEach(radio => {
+                radio.addEventListener('change', updateRecipientCount);
+            });
+        }
+
+        function closeAnnouncementModal() {
+            document.getElementById('announcementModal').style.display = 'none';
+            document.getElementById('announcementForm').reset();
+        }
+
+        function updateRecipientCount() {
+            const filter = document.querySelector('input[name="recipient_filter"]:checked').value;
+            const eventId = currentEventId;
+            
+            fetch(`send-announcement.php?event_id=${eventId}&filter=${filter}`)
+                .then(res => res.json())
+                .then(data => {
+                    const countSpan = document.getElementById('recipientCount');
+                    if (data.count === 0) {
+                        countSpan.textContent = 'No recipients match this filter.';
+                        countSpan.style.color = 'red';
+                    } else if (data.count === 1) {
+                        countSpan.textContent = 'This will be sent to 1 guest.';
+                        countSpan.style.color = '#666';
+                    } else {
+                        countSpan.textContent = `This will be sent to ${data.count} guests.`;
+                        countSpan.style.color = '#666';
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById('recipientCount').textContent = 'Error loading recipient count.';
+                });
+        }
+
+        // Handle announcement form submission
+        document.getElementById('announcementForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            // Show loading state
+            const submitBtn = this.querySelector('.btn-save');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Sending...';
+            submitBtn.disabled = true;
+            
+            fetch('send-announcement.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`Announcement sent successfully to ${data.recipients_count} guest(s)!`);
+                    closeAnnouncementModal();
+                } else {
+                    alert('Error sending announcement: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error sending announcement. Please try again.');
+            })
+            .finally(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            });
         });
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const editModal = document.getElementById('editModal');
+            const announcementModal = document.getElementById('announcementModal');
+            
+            if (event.target == editModal) {
+                closeEditModal();
+            }
+            if (event.target == announcementModal) {
+                closeAnnouncementModal();
+            }
+        }
 
     </script>
 
