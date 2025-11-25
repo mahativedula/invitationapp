@@ -1,0 +1,95 @@
+Sprint Rubric Assessment — Invitation App
+
+Summary: Based on the current repository contents, you meet the minimum Sprint rubric requirements. The project implements multiple different client-side dynamic behaviors, uses JS features and DOM manipulation, includes AJAX/JSON endpoints, uses jQuery in at least one screen, and has server-side PHP endpoints providing JSON where required. Below is a concise pass/fail + evidence list and a few recommendations.
+
+Overall Result: ✅ Meets the minimum rubric requirements
+
+Detailed Mapping to Requirements
+
+1) Add at least five different dynamic behaviors (JS you wrote) — PASS
+   Examples (different behaviors / files):
+   - Event creation preview / template carousel (DOM changes & styling) — file: event-creation.php
+     - Templates object and applyTemplate() change preview background and text color when arrows are clicked.
+     - Guest list UI: Add guest validation and update `guest-data` hidden field; update DOM to list guests.
+   - Host dashboard dynamic behaviors — file: host-dashboard.php
+     - fetch(get-guests.php) → loads guest list JSON and updates popup body.
+     - Edit event modal with fetch('update-event.php') and AJAX form handling.
+     - Announcement modal with asynchronous count lookups and send via fetch('send-announcement.php').
+     - Add Guests modal (client-side list + remote add via fetch('add-guests.php')).
+   - Invitation view (invitations) — file: invitation.php
+     - fetch() calls to update RSVP via AJAX and DOM updates, event listeners for select changes.
+   - Compose message page (client-side validator + UI feedback) — file: compose-message.php
+     - FormValidator object with arrow functions, field validation, dynamic button hover effects.
+   - Sent / Messages screens — file: sent.php and message.php
+     - Sent: modal behavior (IIFE and arrow functions) for viewing messages.
+     - Messages: jQuery-powered modal and AJAX for marking viewed.
+
+2) Each screen must have at least one dynamic behavior — PASS
+   - Event creation → event-creation.php (template carousel, guest list)
+   - Host dashboard → host-dashboard.php (multiple AJAX & DOM behaviors)
+   - Invitation → invitation.php (updates RSVP via fetch)
+   - Messages → message.php (jQuery UI + AJAX)
+   - Compose message / Sent → compose-message.php / sent.php (validation + modals)
+
+3) Client-side input validation, validate form data, and user-appropriate error messages — PASS
+   - event-creation.php: basic name/email checks before adding guest; preview updates prompt user to fill fields.
+   - compose-message.php: FormValidator object validates recipient/subject/content (live and on submit) and displays messages.
+   - Several server-side validation endpoints (create-event, update-event, send-announcement) return JSON error messages consumed by front-end.
+
+4) DOM manipulation — PASS
+   - event-creation (update guest lists / preview text), host-dashboard (populate guest table, update modals), invitation (update RSVP UI), compose-message (dynamic hover/feedback), many more.
+
+5) Modify style/layout when event occurs — PASS
+   - Template carousel changes preview background and text color.
+   - Host dashboard applies theme background/text to sidebar event items and popup header.
+   - Compose / Sent pages use hover effects to change style.
+
+6) Use at least one event listener — PASS
+   - Many examples: addEventListener('input'), click handlers on arrows and guest add button, change listeners for RSVP selects, submit listeners for forms, etc.
+
+7) Anonymous function — PASS
+   - Many anonymous functions used for event callbacks (e.g., function(e) { ... }).
+
+8) Arrow function — PASS
+   - Arrow functions used throughout (e.g., map(g => ...), document.addEventListener('DOMContentLoaded', () => { ... }), or modern callbacks).
+
+9) JavaScript object usage — PASS
+   - `templates` array of objects in event-creation; `formValidator` object in compose-message; various local objects used for state (newGuestsList, guestList, etc.).
+
+10) Use jQuery in at least one screen — PASS
+   - message.php uses jQuery for the modal and AJAX (lines around 150–210). That satisfies "at least one but not all".
+
+11) At least one asynchronous AJAX query consumes JSON from Sprint 3 and modifies DOM — PASS
+   - host-dashboard.php uses fetch('get-guests.php?event_id=...') and manipulates the DOM with the returned JSON guest array.
+   - invitation.php uses fetch to submit/receive JSON for RSVP updates.
+
+12) Good coding style — PARTIAL / Mostly good
+   - Strengths: reasonable identifier names, inline comments in many places, neat structure and consistent indentation.
+   - Observed issues (already corrected or worthy of attention):
+     - create-event.php previously had escaped multi-line SQL strings that created a Postgres syntax error; that was recently fixed.
+     - Some duplicate function headers were introduced earlier then fixed — be careful to avoid duplicates during edits.
+   - Recommendation: add a few more inline JS comments near non-obvious logic (AJAX promise chains, theme mapping) and consider extracting larger scripts to separate .js files for maintainability.
+
+13) Deployment & URL in header — PASS
+   - index.php contains a comment with a working link (example): "https://cs4640.cs.virginia.edu/kur2xk/invitationapp/index.php" — ensure that the deployed instance on the cs4640 server is kept updated with the repo.
+
+Other Observations / Suggestions
+
+- You already exceed the "at least five" dynamic behaviors and have rich AJAX interactions. Great job.
+
+- Optional (extra credit / improvements):
+  - Add theme selection to the Edit Event modal (so the theme can be changed after creation).
+  - Add a small migration script (SQL or PHP script) that runs ALTER TABLE to add theme column to existing DBs and optionally backfill default themes.
+  - Move inline JS into dedicated .js files for better organization and to share JS helpers across pages.
+  - Add unit tests or simple integration tests for key endpoints that return JSON (get-guests.php, send-announcement.php, update-event.php) or validate them via Postman/automated checks.
+
+Conclusion
+
+Your project meets the minimum Sprint requirements. You implemented multiple distinct dynamic behaviors, used various JS features (arrow/function expressions, anonymous functions, objects), consumed JSON on the front end, used jQuery on at least one view, and performed client-side validations and DOM updates. With a couple of minor cleanups (e.g., extract JS into separate files, add a DB migration for existing installs, and small additional comments), you'll be in excellent shape.
+
+If you want, I can:
+- Add the DB migration script and backfill tool for theme column, or
+- Add theme selection UI in the Edit modal and persist theme updates via update-event.php, or
+- Move the inline JS to separate files and tidy code comments.
+
+— Automated assessment output generated by me. If you'd like this saved to a different filename or uploaded somewhere else, tell me where and I'll create it.
