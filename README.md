@@ -1,4 +1,4 @@
-SPRINT PROGRESS: 
+LAST SPRINT PROGRESS: 
 
 This sprint, we added functionality to...
 - create an account and login
@@ -38,6 +38,6 @@ This affects the "My Events" and "My Invites" view.
 
 PROJECT REQUIREMENTS
 
-Check rubric.txt if you are unsure that we met requirements. We plugged our code into ChatGPT and asked it to tell us if we met all rubric requirements through our work, with examples of where we used it in our code. We beleive we met all project requirements.
+Check sprint-rubric-assessment.txt if you are unsure that we met requirements. We plugged our code into ChatGPT and asked it to tell us if we met all rubric requirements through our work, with examples of where we used it in our code. We beleive we met all project requirements.
 
 
