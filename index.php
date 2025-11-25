@@ -1,9 +1,7 @@
 
 <?php
 
-    // working link https://cs4640.cs.virginia.edu/kur2xk/invitationapp/
     // working link https://cs4640.cs.virginia.edu/nsc3sj/invitationapp/
-    // working link https://cs4640.cs.virginia.edu/xyx4pf/invitationapp/
 
 
     // Start the session
