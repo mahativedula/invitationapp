@@ -76,6 +76,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     <title>Invites</title>
     <link rel="stylesheet" href="styles/invitation.css" />
     <meta name="author" content="Fiona Fitzsimons">
+    <style>
+        .rsvp-select option[value=""] {
+            color: #999;
+            font-style: italic;
+        }
+        
+        .rsvp-select.no-response {
+            color: #999;
+            font-style: italic;
+        }
+        
+        .rsvp-select.has-response {
+            color: #000;
+            font-style: normal;
+        }
+    </style>
 </head>
 
 <body>
@@ -123,7 +139,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             </td>
             <td><?php echo date('m/d/Y', strtotime($invite['date'])); ?></td>
             <td>
-                <select class="rsvp-select" data-rsvp-id="<?php echo $invite['rsvp_id']; ?>">
+                <select class="rsvp-select <?php echo $invite['response'] === 'No Response' ? 'no-response' : 'has-response'; ?>" 
+                        data-rsvp-id="<?php echo $invite['rsvp_id']; ?>">
+                    <?php if ($invite['response'] === 'No Response'): ?>
+                        <option value="" disabled selected>No Response</option>
+                    <?php endif; ?>
                     <option value="Going" <?php echo $invite['response'] === 'Going' ? 'selected' : ''; ?>>Going</option>
                     <option value="Not Going" <?php echo $invite['response'] === 'Not Going' ? 'selected' : ''; ?>>Not Going</option>
                     <option value="Maybe" <?php echo $invite['response'] === 'Maybe' ? 'selected' : ''; ?>>Maybe</option>
@@ -154,6 +174,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
+                    // Update styling to show it has a response now
+                    selectElement.classList.remove('no-response');
+                    selectElement.classList.add('has-response');
+                    
                     // DOM manipulation - visual feedback with style change
                     row.style.backgroundColor = '#d4edda';
                     setTimeout(() => {
@@ -177,7 +201,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 const response = this.value;
                 const row = this.closest('tr');
                 
-                updateRSVP(rsvpId, response, this, row);
+                // Only update if a valid response is selected
+                if (response && response !== '') {
+                    updateRSVP(rsvpId, response, this, row);
+                }
             });
         });
         
