@@ -33,14 +33,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['event_id'])) {
 
 // --- Load events for this host ---
 try {
-    $stmt = $db->prepare("SELECT event_id, event_name, date, start_time, end_time FROM invitationapp_events WHERE host_id = :host_id ORDER BY date ASC");
+    $stmt = $db->prepare("SELECT event_id, event_name, date, start_time, end_time, location, description FROM invitationapp_events WHERE host_id = :host_id ORDER BY date ASC");
     $stmt->execute([':host_id' => $host_id]);
     $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     echo "<p style='color:red;'>Error loading your events: " . htmlspecialchars($e->getMessage()) . "</p>";
     $events = [];
 }
+
+function formatTime($time) {
+    if (empty($time)) return '';
+    $timestamp = strtotime($time);
+    return date('g:i A', $timestamp);
+}
+
+function formatTimeRange($start_time, $end_time) {
+    $start = formatTime($start_time);
+    if (!empty($end_time)) {
+        $end = formatTime($end_time);
+        return $start . ' - ' . $end;
+    }
+    return $start;
+}
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -50,6 +67,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="UTF-8">
     <meta author content="Mahati Vedula">
+    <link rel="stylesheet" href="styles/modal.css">
 </head>
 
 <body>
@@ -82,16 +100,26 @@ try {
                     <div 
                         class="event-item" 
                         id="<?php echo $index === 0 ? 'first-event' : ''; ?>"
+                        data-event-id="<?php echo (int)$event['event_id']; ?>"
+                        data-event-name="<?php echo htmlspecialchars($event['event_name']); ?>"
+                        data-event-date="<?php echo htmlspecialchars($event['date']); ?>"
+                        data-start-time="<?php echo htmlspecialchars($event['start_time']); ?>"
+                        data-end-time="<?php echo htmlspecialchars($event['end_time']); ?>"
+                        data-location="<?php echo htmlspecialchars($event['location']); ?>"
+                        data-description="<?php echo htmlspecialchars($event['description']); ?>"
+                        
                         onclick="openEvent(
                             '<?php echo htmlspecialchars(addslashes($event['event_name'])); ?>', 
                             '<?php echo htmlspecialchars(date('F j, Y', strtotime($event['date']))); ?>', 
-                            '<?php echo htmlspecialchars(substr($event['start_time'], 0, 5)); ?>',
+                            '<?php echo htmlspecialchars(formatTimeRange($event['start_time'], $event['end_time'])); ?>',
+                            '<?php echo htmlspecialchars(addslashes($event['location'])); ?>',
+                            '<?php echo htmlspecialchars(addslashes($event['description'])); ?>',
                             <?php echo (int)$event['event_id']; ?>
                         )">
                         <strong><?php echo htmlspecialchars($event['event_name']); ?></strong>
                         <p>
                             <?php echo htmlspecialchars(date('M j, Y', strtotime($event['date']))); ?> 
-                            - <?php echo htmlspecialchars(substr($event['start_time'], 0, 5)); ?>
+                            - <?php echo htmlspecialchars(formatTimeRange($event['start_time'], $event['end_time'])); ?>
                         </p>
                     </div>
                 <?php endforeach; ?>
@@ -107,7 +135,9 @@ try {
                         <h2 id="popupTitle">Event Title</h2>
                         <p><strong>Date:</strong> <span id="popupDate"></span></p>
                         <p><strong>Time:</strong> <span id="popupTime"></span></p>
-                        <button>Edit details</button>
+                        <p><strong>Location:</strong> <span id="popupLocation"></span></p>
+                        <p><strong>Description:</strong> <span id="popupDescription"></span></p>
+                        <button onclick="openEditModal()">Edit details</button>
                     </div>
                 </div>
 
@@ -142,12 +172,58 @@ try {
         </div>
     </div>
 
+    <!-- Edit Event Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditModal()">&times;</span>
+            <h2>Edit Event</h2>
+            <form id="editEventForm" class="modal-form">
+                <input type="hidden" id="editEventId" name="event_id">
+                
+                <label for="editEventName">Event Name:</label>
+                <input type="text" id="editEventName" name="event_name" required>
+                
+                <label for="editDescription">Description:</label>
+                <textarea id="editDescription" name="description"></textarea>
+                
+                <label for="editDate">Date:</label>
+                <input type="date" id="editDate" name="date" required>
+                
+                <div class="time-inputs">
+                    <div>
+                        <label for="editStartTime">Start Time:</label>
+                        <input type="time" id="editStartTime" name="start_time" required>
+                    </div>
+                    <div>
+                        <label for="editEndTime">End Time:</label>
+                        <input type="time" id="editEndTime" name="end_time">
+                    </div>
+                </div>
+                
+                <label for="editLocation">Location:</label>
+                <input type="text" id="editLocation" name="location" required>
+                
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="btn-save">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Updated JS -->
     <script>
-        function openEvent(title, date, time, eventId) {
+
+        let currentEventId = null;
+
+        function openEvent(title, date, time, location, description, eventId) {
+            currentEventId = eventId;
+
             document.getElementById('popupTitle').textContent = title;
             document.getElementById('popupDate').textContent = date;
             document.getElementById('popupTime').textContent = time;
+            document.getElementById('popupLocation').textContent = location
+            document.getElementById('popupDescription').textContent = description;
             document.getElementById('eventPopup').classList.add('active');
 
             // Set the event ID for delete form
@@ -178,8 +254,80 @@ try {
                         '<tr><td colspan="2" style="color:red;">Error loading guests</td></tr>';
                 });
         }
+        function openEditModal() {
+            if (!currentEventId) return;
+            
+            // Find the event data from the sidebar
+            const eventDiv = document.querySelector(`[data-event-id="${currentEventId}"]`);
+            if (!eventDiv) return;
+
+            // Populate the form
+            document.getElementById('editEventId').value = currentEventId;
+            document.getElementById('editEventName').value = eventDiv.dataset.eventName;
+            document.getElementById('editDescription').value = eventDiv.dataset.description;
+            document.getElementById('editDate').value = eventDiv.dataset.eventDate;
+            document.getElementById('editLocation').value = eventDiv.dataset.location;
+            
+            // Format times - remove seconds if present
+            const startTime = eventDiv.dataset.startTime.substring(0, 5);
+            const endTime = eventDiv.dataset.endTime ? eventDiv.dataset.endTime.substring(0, 5) : '';
+            
+            document.getElementById('editStartTime').value = startTime;
+            document.getElementById('editEndTime').value = endTime;
+
+            // Show the modal
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('editModal');
+            if (event.target == modal) {
+                closeEditModal();
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('editEventForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch('update-event.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Event updated successfully!');
+                    closeEditModal();
+                    // Reload the page to show updated data
+                    window.location.reload();
+                } else {
+                    alert('Error updating event: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating event. Please try again.');
+            });
+        });
+
+        // After the page loads, automatically open the first event (if it exists)
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstEventDiv = document.getElementById('first-event');
+            if (firstEventDiv) {
+                firstEventDiv.click();
+            }
+        });
 
     </script>
+
     <script>
     // After the page loads, automatically open the first event (if it exists)
     document.addEventListener('DOMContentLoaded', function() {
