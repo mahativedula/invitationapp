@@ -92,7 +92,7 @@ $messages = $stmt->fetchAll();
         <a href="index.php?page=host-dashboard">My Events</a>
         <a href="index.php?page=invitation">My Invites</a>
         <a href="index.php?page=messages">Messages</a>
-        <a href="settings.html">Settings</a>
+        <a href="index.php?page=settings">Settings</a>
         <a href="index.php?page=login">Logout</a>
     </div>
     <br>

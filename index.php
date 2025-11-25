@@ -46,6 +46,9 @@
         case 'compose-message':
             require 'compose-message.php';
             break;
+        case 'settings':
+            require 'settings.php'; 
+            break;
         default:
             header("Location: ?page=login");
             exit();
